@@ -1,0 +1,44 @@
+export default async function handler(req, res) {
+  try {
+    if (req.method !== "POST") return res.status(405).json({ ok: false, error: "Method not allowed" });
+
+    const { message } = req.body || {};
+    if (!message) return res.status(400).json({ ok: false, error: "Missing message" });
+
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) return res.status(500).json({ ok: false, error: "Missing OPENAI_API_KEY" });
+
+    // 超简单 prompt：先能用、能演示
+    const system = `你是留学生租房AI客服，专门回答 Monash Clayton 附近 rooming house 的问题。
+规则：
+1) 语气专业友好
+2) 先给结论+建议，再补充要问的3个关键问题（最多3个）
+3) 不要编造具体房源地址/编号/“现在有XX套”，除非用户提供。
+4) 结尾给下一步：预约看房/留联系方式/继续补充信息。`;
+
+    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: message },
+        ],
+        temperature: 0.4,
+        max_tokens: 300,
+      }),
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) return res.status(500).json({ ok: false, error: data?.error?.message || "OpenAI error" });
+
+    const reply = data?.choices?.[0]?.message?.content || "（无回复）";
+    return res.json({ ok: true, reply });
+  } catch (e) {
+    return res.status(500).json({ ok: false, error: e?.message || "Server error" });
+  }
+}
