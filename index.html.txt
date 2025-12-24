@@ -18,13 +18,13 @@
     </style>
   </head>
   <body>
-    <h1>LeaseMind V2（Monash Clayton 租房 AI 客服）</h1>
-    <p class="hint">超简化版：网页 → /api/chat → OpenAI → 返回文字</p>
-
+   <h1>LeaseMind – 留学生租房决策 AI 助手（V2 Demo）</h1>
+   <p class="hint"> 把零散的租房问题，变成清晰的决策建议与下一步行动｜Monash Clayton 首站｜实时 AI 回复（OpenAI API）
+</p>
     <div class="box" id="chat"></div>
 
     <div class="row">
-      <input id="inp" placeholder="例如：单人间，$280–$320/周，下周入住…" />
+      <input id="inp" placeholder="试试输入：我想在 Monash Clayton 附近找单人间，预算 $280–$320/周，下周入住" />
       <button id="btn">发送</button>
     </div>
 
@@ -41,7 +41,7 @@
         window.scrollTo(0, document.body.scrollHeight);
       }
 
-      add("assistant", "你好！我是 LeaseMind（V2 Demo）。告诉我预算、房型、入住时间，我帮你筛选并指导下一步。");
+      add("assistant", "你好，我是 LeaseMind。\n\n我可以帮助你梳理在 Monash Clayton 附近租房的关键决策点：预算、房型、距离、入住时间，并给出可执行的下一步（例如预约看房/继续补充信息）。\n\n请直接告诉我你的租房需求。");
 
       async function send() {
         const text = inp.value.trim();
