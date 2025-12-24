@@ -1,77 +1,74 @@
-<script>
-console.log("✅ index.html script running");
 <!doctype html>
 <html lang="zh">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LeaseMind V2 Demo</title>
-    <style>
-      body { font-family: Arial, sans-serif; max-width: 860px; margin: 24px auto; padding: 0 12px; }
-      .box { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
-      .msg { padding: 10px 12px; border: 1px solid #eee; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
-      .user { text-align: right; background: #fafafa; }
-      .assistant { text-align: left; }
-      .row { display: flex; gap: 8px; margin-top: 12px; }
-      input { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; }
-      button { padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; background: white; cursor: pointer; }
-      button:disabled { opacity: .6; cursor: not-allowed; }
-      .hint { font-size: 13px; opacity: .7; margin-top: 8px; }
-    </style>
-  </head>
-  <body>
-   <h1>LeaseMind – 留学生租房决策 AI 助手（V2 Demo）</h1>
-   <p class="hint"> 把零散的租房问题，变成清晰的决策建议与下一步行动｜Monash Clayton 首站｜实时 AI 回复（OpenAI API）
-</p>
-    <div class="box" id="chat"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeaseMind AI Demo</title>
 
-    <div class="row">
-      <input id="inp" placeholder="试试输入：我想在 Monash Clayton 附近找单人间，预算 $280–$320/周，下周入住" />
-      <button id="btn">发送</button>
-    </div>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 680px; margin: auto; padding: 12px; }
+    #box { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
+    .msg { padding: 10px 12px; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
+    .user { text-align: right; background: #fafafa; }
+    .assistant { text-align: left; background: #f2f2f2; }
+    .row { display: flex; gap: 8px; margin-top: 12px; }
+    input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+    button { padding: 10px 14px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; }
+  </style>
+</head>
 
-    <script>
-      const chat = document.getElementById("chat");
-      const inp = document.getElementById("inp");
-      const btn = document.getElementById("btn");
+<body>
+  <h2>LeaseMind · Monash Clayton AI Demo</h2>
 
-      function add(role, text) {
-        const div = document.createElement("div");
-        div.className = "msg " + (role === "user" ? "user" : "assistant");
-        div.textContent = text;
-        chat.appendChild(div);
-        window.scrollTo(0, document.body.scrollHeight);
+  <div id="box"></div>
+
+  <div class="row">
+    <input id="inp" placeholder="例如：预算 280–320，Monash Clayton 单人间" />
+    <button id="btn">发送</button>
+  </div>
+
+  <!-- ✅ 所有 JS 一定放在 body 最后 -->
+  <script>
+    console.log("✅ index.html script running");
+
+    const box = document.getElementById("box");
+    const inp = document.getElementById("inp");
+    const btn = document.getElementById("btn");
+
+    function add(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + role;
+      div.textContent = text;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    add("assistant", "你好，我是 LeaseMind，可以帮你了解 Monash Clayton 附近的租房信息。");
+
+    function fakeReply(text) {
+      if (text.includes("280") || text.includes("300")) {
+        return "在 Monash Clayton，280–320/周的单人间主要是 rooming house，步行或公交 10–20 分钟。";
       }
+      return "可以的，请告诉我你的预算、是否需要 ensuite、以及到 Monash Clayton 的通勤偏好。";
+    }
 
-      add("assistant", "你好，我是 LeaseMind。\n\n我可以帮助你梳理在 Monash Clayton 附近租房的关键决策点：预算、房型、距离、入住时间，并给出可执行的下一步（例如预约看房/继续补充信息）。\n\n请直接告诉我你的租房需求。");
+    function send() {
+      const text = inp.value.trim();
+      if (!text) return;
+      inp.value = "";
+      add("user", text);
 
-      async function send() {
-        const text = inp.value.trim();
-        if (!text) return;
-        inp.value = "";
-        btn.disabled = true;
-        add("user", text);
+      btn.disabled = true;
+      setTimeout(() => {
+        add("assistant", fakeReply(text));
+        btn.disabled = false;
+      }, 600);
+    }
 
-        try {
-          const r = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ message: text })
-          });
-          const j = await r.json();
-          if (!j.ok) throw new Error(j.error || "API error");
-          add("assistant", j.reply);
-        } catch (e) {
-          add("assistant", "出错了：" + (e.message || e));
-        } finally {
-          btn.disabled = false;
-          inp.focus();
-        }
-      }
-
-      btn.onclick = send;
-      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
-    </script>
-  </body>
+    btn.onclick = send;
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") send();
+    });
+  </script>
+</body>
 </html>
-
