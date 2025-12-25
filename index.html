@@ -1,74 +1,604 @@
 <!doctype html>
 <html lang="zh">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LeaseMind AI Demo</title>
-
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 680px; margin: auto; padding: 12px; }
-    #box { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
-    .msg { padding: 10px 12px; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
-    .user { text-align: right; background: #fafafa; }
-    .assistant { text-align: left; background: #f2f2f2; }
-    .row { display: flex; gap: 8px; margin-top: 12px; }
-    input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
-    button { padding: 10px 14px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; }
-  </style>
-</head>
-
-<body>
-  <h2>LeaseMind · Monash Clayton AI Demo</h2>
-
-  <div id="box"></div>
-
-  <div class="row">
-    <input id="inp" placeholder="例如：预算 280–320，Monash Clayton 单人间" />
-    <button id="btn">发送</button>
-  </div>
-
-  <!-- ✅ 所有 JS 一定放在 body 最后 -->
-  <script>
-    console.log("✅ index.html script running");
-
-    const box = document.getElementById("box");
-    const inp = document.getElementById("inp");
-    const btn = document.getElementById("btn");
-
-    function add(role, text) {
-      const div = document.createElement("div");
-      div.className = "msg " + role;
-      div.textContent = text;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    add("assistant", "你好，我是 LeaseMind，可以帮你了解 Monash Clayton 附近的租房信息。");
-
-    function fakeReply(text) {
-      if (text.includes("280") || text.includes("300")) {
-        return "在 Monash Clayton，280–320/周的单人间主要是 rooming house，步行或公交 10–20 分钟。";
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeaseMind V2 Demo | AI Rental Concierge</title>
+    <style>
+      :root {
+        --border: #e6e6e6;
+        --text: #111;
+        --muted: rgba(0,0,0,.65);
+        --bg: #fff;
+        --soft: #fafafa;
+        --chip: #f3f3f3;
+        --shadow: 0 8px 24px rgba(0,0,0,.06);
+        --radius: 14px;
       }
-      return "可以的，请告诉我你的预算、是否需要 ensuite、以及到 Monash Clayton 的通勤偏好。";
-    }
+      body {
+        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        max-width: 980px;
+        margin: 24px auto;
+        padding: 0 14px 40px;
+        line-height: 1.5;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .badge {
+        font-size: 12px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: #fff;
+      }
+      h1 {
+        font-size: 26px;
+        margin: 6px 0 6px;
+        letter-spacing: -0.2px;
+      }
+      .sub {
+        color: var(--muted);
+        margin: 0 0 14px;
+        font-size: 14px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 14px;
+      }
+      @media (max-width: 900px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        background: #fff;
+        box-shadow: var(--shadow);
+      }
+      .card h2 {
+        font-size: 15px;
+        margin: 0 0 8px;
+      }
+      .card p, .card li {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .kpi {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .kpi .box {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 10px;
+        background: var(--soft);
+      }
+      .kpi .num {
+        font-size: 16px;
+        font-weight: 650;
+        color: var(--text);
+      }
+      .kpi .lbl {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .sep {
+        height: 1px;
+        background: var(--border);
+        margin: 14px 0;
+      }
+      .chat {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px;
+        background: #fff;
+        box-shadow: var(--shadow);
+      }
+      .chathead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .chathead .title {
+        font-weight: 650;
+        font-size: 14px;
+      }
+      .chathead .mini {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .msgs {
+        max-height: 420px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+      .msg {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 10px 12px;
+        margin: 8px 0;
+        white-space: pre-wrap;
+        background: #fff;
+      }
+      .msg.user {
+        margin-left: auto;
+        background: var(--soft);
+        max-width: 92%;
+      }
+      .msg.ai {
+        margin-right: auto;
+        max-width: 92%;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      input {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        outline: none;
+      }
+      button {
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+        cursor: pointer;
+      }
+      button:hover { background: var(--soft); }
+      button:disabled { opacity: .55; cursor: not-allowed; }
+      .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .chip {
+        font-size: 12px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--chip);
+        cursor: pointer;
+      }
+      .chip:hover { filter: brightness(0.98); }
+      .cta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .cta a {
+        display: inline-block;
+        text-decoration: none;
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: #fff;
+      }
+      .cta a:hover { background: var(--soft); }
+      .foot {
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .tag {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: #fff;
+        margin-left: 6px;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
 
-    function send() {
-      const text = inp.value.trim();
-      if (!text) return;
-      inp.value = "";
-      add("user", text);
+  <body>
+    <div class="topbar">
+      <div class="badge">V2 Demo · Investor Preview</div>
+      <div class="badge">Monash Clayton · Student Housing</div>
+    </div>
 
-      btn.disabled = true;
-      setTimeout(() => {
-        add("assistant", fakeReply(text));
-        btn.disabled = false;
-      }, 600);
-    }
+    <h1>LeaseMind – 留学生租房决策 AI 助手</h1>
+    <p class="sub">
+      将零散、重复的租房问题，转化为 <b>结构化决策建议</b> 与 <b>可执行下一步</b>（看房/留资/跟进）。
+      <span class="tag">本页为本地模拟 AI，不依赖 API</span>
+    </p>
 
-    btn.onclick = send;
-    inp.addEventListener("keydown", e => {
-      if (e.key === "Enter") send();
-    });
-  </script>
-</body>
+    <div class="grid">
+      <!-- Left: Chat -->
+      <div class="chat">
+        <div class="chathead">
+          <div>
+            <div class="title">Live Demo Chat <span class="tag">Local AI Simulator</span></div>
+            <div class="mini">输入需求 → AI 补问关键点 → 给出建议与下一步</div>
+          </div>
+          <div class="mini mono" id="mode">Mode: Demo</div>
+        </div>
+
+        <div class="msgs" id="msgs"></div>
+
+        <div class="chips" id="chips"></div>
+
+        <div class="row">
+          <input
+            id="inp"
+            placeholder="试试：我想在 Monash Clayton 附近找单人间，预算 280–320/周，下周入住"
+          />
+          <button id="btn">发送</button>
+        </div>
+
+        <div class="cta">
+          <!-- 你把下面两个链接换成你自己的 Google Form/WhatsApp/WeChat -->
+          <a href="#" id="book">📅 预约看房（Demo）</a>
+          <a href="#" id="leave">📩 留下联系方式（Demo）</a>
+        </div>
+
+        <div class="foot">
+          说明：此版本用于演示“交互逻辑与文案表达”。后续可无缝替换为真实 LLM（OpenAI）与房源数据。
+        </div>
+      </div>
+
+      <!-- Right: Investor copy -->
+      <div class="card">
+        <h2>What does LeaseMind do?</h2>
+        <p>
+          LeaseMind is an AI rental concierge for international students.
+          It sits <b>before listings and agents</b> — turning natural language needs into
+          structured decisions and next actions.
+        </p>
+
+        <div class="sep"></div>
+
+        <h2>The problem we solve</h2>
+        <ul>
+          <li><b>Information overload</b>：房源多、信息杂、决策成本高</li>
+          <li><b>High friction</b>：反复提问、响应慢、跟进断层</li>
+          <li><b>No decision layer</b>：缺少把“问题”变成“下一步”的系统</li>
+        </ul>
+
+        <div class="sep"></div>
+
+        <h2>What this demo validates</h2>
+        <ul>
+          <li>意图识别：预算/房型/距离/入住时间</li>
+          <li>最小补问：最多 3 个关键问题</li>
+          <li>行动引导：看房、留资、继续补充信息</li>
+        </ul>
+
+        <div class="kpi">
+          <div class="box">
+            <div class="num">V2</div>
+            <div class="lbl">互动路径可演示</div>
+          </div>
+          <div class="box">
+            <div class="num">≤ 3</div>
+            <div class="lbl">最小澄清问题</div>
+          </div>
+          <div class="box">
+            <div class="num">Next</div>
+            <div class="lbl">预约 / 留资 CTA</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <h2>Next phase</h2>
+        <p>
+          Replace Local Simulator with real LLM + listings data:
+          <br />• Live property database integration
+          <br />• Inspection scheduling automation
+          <br />• CRM workflow for agents / operators
+          <br />• Expansion to multi-campus & cities
+        </p>
+
+        <div class="foot">
+          LeaseMind © 2025 · For discussion and evaluation purposes only
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ======= Local AI Simulator (no API, no JSON, no errors) =======
+      const msgs = document.getElementById("msgs");
+      const chips = document.getElementById("chips");
+      const inp = document.getElementById("inp");
+      const btn = document.getElementById("btn");
+      const mode = document.getElementById("mode");
+      const book = document.getElementById("book");
+      const leave = document.getElementById("leave");
+
+      // You can replace these with real links (Google Form, WhatsApp, WeChat, Calendly)
+      const INSPECTION_URL = "#";
+      const LEAD_URL = "#";
+      book.href = INSPECTION_URL;
+      leave.href = LEAD_URL;
+
+      // Simple session state (no persistence)
+      const state = {
+        language: "zh", // "zh" | "en"
+        needs: {
+          suburb: "Clayton",
+          near: "Monash University Clayton",
+          roomType: null, // single/ensuite/twin/studio
+          budgetMin: null,
+          budgetMax: null,
+          moveIn: null,
+          lease: null
+        },
+        turn: 0
+      };
+
+      function add(role, text) {
+        const div = document.createElement("div");
+        div.className = "msg " + (role === "user" ? "user" : "ai");
+        div.textContent = text;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+      }
+
+      function setChips(list) {
+        chips.innerHTML = "";
+        (list || []).forEach((t) => {
+          const b = document.createElement("button");
+          b.className = "chip";
+          b.type = "button";
+          b.textContent = t;
+          b.onclick = () => send(t);
+          chips.appendChild(b);
+        });
+      }
+
+      function detectLanguage(text) {
+        // if mostly ASCII letters -> EN
+        const ascii = (text.match(/[A-Za-z]/g) || []).length;
+        const han = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+        return ascii > han ? "en" : "zh";
+      }
+
+      function parseBudget(text) {
+        // matches: 280-320, 280–320, $280-$320, 280 320
+        const m = text
+          .replace(/—/g, "-")
+          .replace(/–/g, "-")
+          .match(/(\d{2,4})\s*[-~]\s*(\d{2,4})/);
+        if (m) return { min: Number(m[1]), max: Number(m[2]) };
+
+        // single number: 300/week
+        const m2 = text.match(/(\d{2,4})\s*(aud|a\$|\$)?\s*(\/?\s*week|\/?\s*w|每周|\/周)?/i);
+        if (m2) return { min: Number(m2[1]), max: Number(m2[1]) };
+
+        return null;
+      }
+
+      function parseRoomType(text) {
+        const t = text.toLowerCase();
+        if (t.includes("ensuite") || text.includes("独立卫浴") || text.includes("套房")) return "ensuite";
+        if (t.includes("studio") || text.includes("单间公寓")) return "studio";
+        if (t.includes("twin") || text.includes("双人间")) return "twin";
+        if (t.includes("single") || text.includes("单人间")) return "single";
+        return null;
+      }
+
+      function parseMoveIn(text) {
+        // Very simple: "下周" / "本周" / date-like
+        if (text.includes("下周")) return "next_week";
+        if (text.includes("本周") || text.includes("这周")) return "this_week";
+        const m = text.match(/(20\d{2})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+        if (m) return `${m[1]}-${String(m[2]).padStart(2, "0")}-${String(m[3]).padStart(2, "0")}`;
+        return null;
+      }
+
+      function maybeUpdateNeeds(userText) {
+        state.language = detectLanguage(userText);
+        mode.textContent = "Mode: Demo (" + (state.language === "zh" ? "中文" : "EN") + ")";
+
+        const b = parseBudget(userText);
+        if (b) {
+          state.needs.budgetMin = b.min;
+          state.needs.budgetMax = b.max;
+        }
+
+        const rt = parseRoomType(userText);
+        if (rt) state.needs.roomType = rt;
+
+        const mi = parseMoveIn(userText);
+        if (mi) state.needs.moveIn = mi;
+
+        // suburb hints
+        const s = userText.toLowerCase();
+        const suburbs = ["clayton", "oakleigh", "huntingdale", "notting hill", "mount waverley", "caulfield"];
+        for (const sub of suburbs) {
+          if (s.includes(sub)) {
+            state.needs.suburb = sub.charAt(0).toUpperCase() + sub.slice(1);
+            break;
+          }
+        }
+      }
+
+      function buildClarifyingQuestions() {
+        const q = [];
+        if (!state.needs.roomType) q.push(state.language === "zh" ? "你更想要单人间还是独立卫浴（Ensuite）？" : "Do you prefer a single room or an ensuite?");
+        if (!state.needs.budgetMin) q.push(state.language === "zh" ? "你的预算大概是每周多少澳币（AUD/week）？" : "What’s your weekly budget (AUD/week)?");
+        if (!state.needs.moveIn) q.push(state.language === "zh" ? "你希望什么时候入住（例如：这周/下周/具体日期）？" : "When do you want to move in (this week / next week / a date)?");
+
+        // keep <= 3
+        return q.slice(0, 3);
+      }
+
+      function summaryLine() {
+        const n = state.needs;
+        const rtMapZh = { single: "单人间", ensuite: "独立卫浴", twin: "双人间", studio: "Studio", null: "未指定" };
+        const rtMapEn = { single: "single room", ensuite: "ensuite", twin: "twin room", studio: "studio", null: "unspecified" };
+
+        const budget =
+          n.budgetMin && n.budgetMax
+            ? (state.language === "zh"
+                ? `预算：$${n.budgetMin}–$${n.budgetMax}/周`
+                : `Budget: $${n.budgetMin}–$${n.budgetMax}/week`)
+            : (state.language === "zh" ? "预算：未填写" : "Budget: not provided");
+
+        const room =
+          state.language === "zh"
+            ? `房型：${rtMapZh[n.roomType]}`
+            : `Room type: ${rtMapEn[n.roomType]}`;
+
+        const move =
+          n.moveIn
+            ? (state.language === "zh"
+                ? `入住：${n.moveIn === "next_week" ? "下周" : n.moveIn === "this_week" ? "本周" : n.moveIn}`
+                : `Move-in: ${n.moveIn === "next_week" ? "next week" : n.moveIn === "this_week" ? "this week" : n.moveIn}`)
+            : (state.language === "zh" ? "入住：未填写" : "Move-in: not provided");
+
+        const loc =
+          state.language === "zh"
+            ? `位置：${n.suburb}（Monash Clayton 周边）`
+            : `Location: ${n.suburb} (near Monash Clayton)`;
+
+        return `${loc}\n${room}\n${budget}\n${move}`;
+      }
+
+      function buildAnswer() {
+        const n = state.needs;
+        const missing = buildClarifyingQuestions();
+
+        if (state.language === "zh") {
+          let head = "好的，我理解你的需求了。我先把信息整理成“可决策”的格式：\n\n";
+          let summary = summaryLine() + "\n\n";
+          let guidance =
+            "基于 Monash Clayton 周边常见租房决策流程，我建议你下一步按这个顺序：\n" +
+            "1) 先确认房型（单人间 vs 独立卫浴）与入住时间\n" +
+            "2) 再锁定步行/公交通勤接受范围\n" +
+            "3) 最后进入看房与留资跟进\n\n";
+
+          if (missing.length) {
+            let qs = "为了更精准匹配，我只需要你补充 1–3 个关键信息：\n";
+            missing.forEach((x, i) => (qs += `${i + 1}) ${x}\n`));
+            qs += "\n你可以直接回复答案，或者点击下面的快捷问题。";
+            return head + summary + guidance + qs;
+          }
+
+          return (
+            head +
+            summary +
+            "太好了，你的信息已经足够进入“看房/推荐”阶段。\n\n" +
+            "下一步我建议：\n" +
+            "• 点击「预约看房」：安排 open inspection 或私约\n" +
+            "• 或点击「留下联系方式」：我会把你的需求整理给运营/顾问跟进\n"
+          );
+        } else {
+          let head = "Got it. Here is your request in a decision-ready format:\n\n";
+          let summary = summaryLine() + "\n\n";
+          let guidance =
+            "Suggested next steps:\n" +
+            "1) Confirm room type (single vs ensuite) and move-in time\n" +
+            "2) Define commute preference (walk/bus) and acceptable range\n" +
+            "3) Proceed to inspection scheduling and follow-up\n\n";
+
+          if (missing.length) {
+            let qs = "To match more accurately, please answer up to 3 quick questions:\n";
+            missing.forEach((x, i) => (qs += `${i + 1}) ${x}\n`));
+            qs += "\nReply with your answers or click a quick prompt below.";
+            return head + summary + guidance + qs;
+          }
+
+          return (
+            head +
+            summary +
+            "Great — you’re ready for inspection / shortlisting.\n\n" +
+            "Next actions:\n" +
+            "• Book an inspection\n" +
+            "• Leave your contact for operator follow-up\n"
+          );
+        }
+      }
+
+      function defaultChips() {
+        if (state.language === "zh") {
+          return [
+            "我想要单人间（Single）",
+            "我更偏好独立卫浴（Ensuite）",
+            "预算 280–320/周",
+            "下周入住",
+            "步行 10 分钟内"
+          ];
+        }
+        return [
+          "Single room preferred",
+          "Ensuite preferred",
+          "Budget 280–320/week",
+          "Move in next week",
+          "Within 10-min walk"
+        ];
+      }
+
+      async function send(text) {
+        const t = (text || "").trim();
+        if (!t) return;
+
+        btn.disabled = true;
+        add("user", t);
+
+        // Update needs based on user input
+        maybeUpdateNeeds(t);
+
+        // Simulate thinking
+        setTimeout(() => {
+          const reply = buildAnswer();
+          add("ai", reply);
+
+          // Update chips with clarifying questions or defaults
+          const qs = buildClarifyingQuestions();
+          setChips(qs.length ? qs : defaultChips());
+
+          btn.disabled = false;
+          inp.focus();
+        }, 350);
+      }
+
+      // Welcome
+      add(
+        "ai",
+        "你好，我是 LeaseMind。\n\n我可以帮助你把租房需求变成清晰的决策建议：预算、房型、距离、入住时间，并给出下一步（看房/留资）。\n\n请直接告诉我你的租房需求。"
+      );
+      setChips(defaultChips());
+
+      btn.onclick = () => send(inp.value), (inp.value = "");
+      btn.addEventListener("click", () => {
+        const v = inp.value;
+        inp.value = "";
+        send(v);
+      });
+
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const v = inp.value;
+          inp.value = "";
+          send(v);
+        }
+      });
+    </script>
+  </body>
 </html>
