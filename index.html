@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LeaseMind V2 Demo | AI Rental Decision Layer</title>
+  <title>LeaseMind V2.1 Demo | AI Rental Decision Layer</title>
   <style>
     :root{
       --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280;
-      --line:#e5e7eb; --blue:#2563eb; --green:#16a34a; --amber:#f59e0b;
+      --line:#e5e7eb; --blue:#2563eb; --green:#16a34a; --amber:#b45309;
+      --soft:#f3f4f6;
     }
     *{box-sizing:border-box}
     body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial;
       background:var(--bg); color:var(--text);}
     .wrap{max-width:1180px; margin:18px auto; padding:0 14px;}
     .topbar{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:12px;}
-    .brand{font-weight:800; font-size:18px;}
-    .sub{color:var(--muted); font-size:12px; margin-top:4px;}
+    .brand{font-weight:900; font-size:18px;}
+    .sub{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35;}
     .mode{font-size:12px; color:var(--muted);}
     .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px;}
     .card{background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,.04);}
@@ -26,31 +27,31 @@
     .pill b{color:var(--text)}
     .chat{height:420px; overflow:auto; padding:6px 2px;}
     .msg{max-width:92%; padding:10px 12px; border-radius:12px; margin:8px 0; white-space:pre-wrap; line-height:1.35;}
-    .assistant{background:#f3f4f6; border:1px solid #eef2f7;}
+    .assistant{background:var(--soft); border:1px solid #eef2f7;}
     .user{background:#eff6ff; border:1px solid #dbeafe; margin-left:auto;}
-    .hint{color:var(--muted); font-size:12px; margin:0 0 10px 0;}
+    .hint{color:var(--muted); font-size:12px; margin:0 0 10px 0; line-height:1.35;}
     .row{display:flex; gap:10px; margin-top:10px;}
     input[type="text"]{flex:1; padding:12px 12px; border-radius:12px; border:1px solid var(--line); outline:none;}
-    button{padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; cursor:pointer; font-weight:700;}
+    button{padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; cursor:pointer; font-weight:800;}
     button:hover{border-color:#cbd5e1}
     button.primary{background:var(--blue); color:#fff; border-color:var(--blue);}
     button.primary:hover{filter:brightness(.98)}
-    button.ghost{background:#fff;}
     .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
     .chip{font-size:12px; border:1px solid var(--line); background:#fff; border-radius:999px; padding:8px 10px; cursor:pointer;}
     .chip:hover{border-color:#cbd5e1}
     .actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
-    .actions button{flex:1; min-width:160px;}
+    .actions button{flex:1; min-width:180px;}
     .note{font-size:12px; color:var(--muted); margin-top:10px; line-height:1.35;}
     .kpi{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;}
     .kpi .box{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:#fff;}
     .kpi .box .t{font-size:12px; color:var(--muted);}
-    .kpi .box .v{font-size:16px; font-weight:800; margin-top:3px;}
-    .lead{border:1px dashed #cbd5e1; border-radius:12px; padding:10px 12px; background:#fafafa; margin-top:10px;}
-    .lead b{display:block; margin-bottom:6px;}
-    .small{font-size:12px; color:var(--muted);}
-    .ok{color:var(--green); font-weight:700;}
-    .warn{color:#b45309; font-weight:700;}
+    .kpi .box .v{font-size:16px; font-weight:900; margin-top:3px;}
+    .lead{border:1px dashed #cbd5e1; border-radius:12px; padding:12px; background:#fafafa; margin-top:10px;}
+    .lead b{display:block; margin-bottom:8px;}
+    .small{font-size:12px; color:var(--muted); line-height:1.45;}
+    .ok{color:var(--green); font-weight:900;}
+    .warn{color:var(--amber); font-weight:900;}
+    .tag{display:inline-block; font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--muted); margin-right:6px;}
     @media (max-width: 980px){
       .grid{grid-template-columns:1fr;}
       .chat{height:380px;}
@@ -62,90 +63,101 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <div class="brand">LeaseMind <span class="pill"><b>V2</b> Demo</span></div>
-        <div class="sub">AI Rental Decision Layer · 本地模拟（不依赖 API）· 用于展示“决策→行动”闭环</div>
+        <div class="brand">LeaseMind <span class="pill"><b>V2.1</b> Demo</span></div>
+        <div class="sub">
+          <span class="tag">本地模拟（无 API）</span>
+          <span class="tag">不编造房源事实</span>
+          <span class="tag">决策层 → 行动闭环</span><br/>
+          将“模糊租房咨询”转化为：<b>已确认约束</b> + <b>待确认缺口</b> + <b>可执行动作</b>（看房 / 留资 / 转人工）。
+        </div>
       </div>
-      <div class="mode">Mode: <b>Demo（中文）</b> · Max Clarifying Qs: <b>≤3</b></div>
+      <div class="mode">Mode: <b>Investor Demo（中文）</b> · Clarifying: <b>≤3</b> · Output: <b>结构化</b></div>
     </div>
 
     <div class="grid">
       <!-- LEFT: Chat -->
       <div class="card">
         <div class="card-h">
-          <div><b>Live Demo Chat</b> <span class="pill">Local AI Simulator</span></div>
+          <div><b>Live Demo Chat</b> <span class="pill">Decision Layer Simulator</span></div>
           <div class="pill">Status: <b id="status">Ready</b></div>
         </div>
         <div class="card-b">
-          <p class="hint">输入需求 → AI 补问 ≤3 次 → 输出结构化建议 → 点击 <b>预约看房</b> / <b>留下联系方式</b> 完成闭环。</p>
+          <p class="hint">
+            输入需求 → 系统最多补问 <b>≤3</b> 个关键信息 → 输出「可执行决策草案」→ 点击 <b>进入看房流程</b> / <b>生成客户需求记录</b> 完成闭环。<br/>
+            <span class="warn">演示原则：</span>没有数据就不猜；缺信息就问；不生成虚构房源细节（租金/距离/地址/空房）。
+          </p>
 
           <div id="chat" class="chat"></div>
 
           <div class="chips">
-            <div class="chip" data-fill="我想在 Monash Clayton 附近找单人间，预算 280–320 澳币/周，下周入住">试试：单人间 280–320/周 下周入住</div>
-            <div class="chip" data-fill="我更倾向独立卫浴（Ensuite），走路 10 分钟内到 Monash Clayton，预算 320–380/周">试试：Ensuite 10 分钟内 320–380/周</div>
-            <div class="chip" data-fill="我想先预约 open inspection，本周六下午有空">试试：预约 open inspection</div>
-            <div class="chip" data-fill="我想留下联系方式，让顾问联系我">试试：留下联系方式</div>
+            <div class="chip" data-fill="我想在 Monash Clayton 附近找单人间，预算 280–320 澳币/周，下周入住">示例：Single 280–320/周 下周入住</div>
+            <div class="chip" data-fill="我更倾向独立卫浴（Ensuite），走路 10 分钟内到 Monash Clayton，预算 320–380/周">示例：Ensuite 10 分钟内 320–380/周</div>
+            <div class="chip" data-fill="我想先预约 open inspection，本周六下午有空">示例：预约 open inspection</div>
+            <div class="chip" data-fill="我想留下联系方式，让顾问联系我">示例：留下联系方式</div>
           </div>
 
           <div class="row">
-            <input id="inp" type="text" placeholder="例如：我想在 Monash Clayton 附近找单人间，预算 280–320/周，下周入住…" />
+            <input id="inp" type="text" placeholder="例如：我想找 Single，预算 280–320/周，下周入住，离 Monash Clayton 步行 10 分钟内…" />
             <button id="btnSend" class="primary">发送</button>
           </div>
 
           <div class="actions">
-            <button id="btn-inspect" class="ghost">预约看房（Demo）</button>
-            <button id="btn-contact" class="ghost">留下联系方式（Demo）</button>
+            <button id="btn-inspect">进入看房流程（Demo）</button>
+            <button id="btn-contact">生成客户需求记录（Demo）</button>
+          </div>
+
+          <div class="small" style="margin-top:8px;">
+            * Demo 中按钮将模拟：生成预约请求 / 生成 CRM 线索卡（不会发送真实消息）。
           </div>
 
           <div id="leadBox" class="lead" style="display:none;"></div>
 
           <div class="note">
-            说明：此版本用于展示交互逻辑与文案表达，后续可无缝替换为真实 LLM（OpenAI）与房源数据库 / CRM 工作流。<br/>
-            <span class="warn">本地模拟不会生成任何“虚构房源事实”</span>：若缺信息会先补问或提示转人工。
+            下一阶段（真实产品）：替换本地模拟为 LLM + Guardrails，并接入房源库、排期系统与 CRM 工作流。
           </div>
         </div>
       </div>
 
       <!-- RIGHT: Investor panel -->
       <div class="card">
-        <div class="card-h"><b>Investor View</b> <span class="pill">1-page narrative</span></div>
+        <div class="card-h"><b>Investor View</b> <span class="pill">One-page</span></div>
         <div class="card-b">
           <h3 style="margin:0 0 8px 0;">What does LeaseMind do?</h3>
           <div class="small">
-            LeaseMind sits <b>before listings and agents</b>, turning messy rental questions into <b>structured decisions</b> and <b>next actions</b>.
+            LeaseMind sits <b>before listings and agents</b>, turning messy rental conversations into <b>structured decisions</b> and <b>next actions</b>.
           </div>
 
           <h3 style="margin:14px 0 8px 0;">The problem we solve</h3>
-          <ul class="small" style="margin:0; padding-left:18px; line-height:1.5;">
+          <ul class="small" style="margin:0; padding-left:18px;">
             <li><b>Information overload</b>: users can’t compare options rationally</li>
             <li><b>High friction</b>: repeated Q&A wastes consultant time</li>
-            <li><b>No decision layer</b>:咨询缺少标准化“收敛到行动”</li>
+            <li><b>No decision layer</b>:咨询缺少“收敛成动作”的标准流程</li>
           </ul>
 
           <h3 style="margin:14px 0 8px 0;">What this demo validates</h3>
-          <ul class="small" style="margin:0; padding-left:18px; line-height:1.5;">
-            <li>意图识别：预算 / 房型 / 距离 / 入住时间</li>
-            <li>最小补问：≤3 个澄清问题</li>
-            <li>行动引导：预约看房、留资、转人工</li>
+          <ul class="small" style="margin:0; padding-left:18px;">
+            <li>结构化：已确认约束 / 待确认缺口</li>
+            <li>补问控制：≤3 个关键问题</li>
+            <li>闭环：看房流程 / 留资线索 / 转人工</li>
           </ul>
 
           <div class="kpi">
             <div class="box">
-              <div class="t">V2</div>
-              <div class="v">Local Simulator</div>
+              <div class="t">V2.1</div>
+              <div class="v">Decision Output</div>
             </div>
             <div class="box">
-              <div class="t">Max Clarifying</div>
-              <div class="v">≤ 3</div>
+              <div class="t">Guardrail</div>
+              <div class="v">No Hallucination</div>
             </div>
           </div>
 
           <h3 style="margin:14px 0 8px 0;">Next phase</h3>
-          <ul class="small" style="margin:0; padding-left:18px; line-height:1.5;">
-            <li>Replace simulator with real LLM + guardrails</li>
-            <li>Live property database integration</li>
+          <ul class="small" style="margin:0; padding-left:18px;">
+            <li>LLM + Guardrails + property dataset</li>
             <li>Inspection scheduling automation</li>
             <li>CRM workflow for agents/operators</li>
+            <li>Expand to multi-campus & cities</li>
           </ul>
 
           <div class="small" style="margin-top:12px;">LeaseMind © 2026 · For discussion and evaluation</div>
@@ -156,7 +168,7 @@
 
   <script>
     // -----------------------
-    // Chat helpers
+    // UI helpers
     // -----------------------
     const chat = document.getElementById("chat");
     const inp  = document.getElementById("inp");
@@ -177,18 +189,19 @@
     function setStatus(s){ statusEl.innerText = s; }
 
     // -----------------------
-    // Minimal "decision layer" state
+    // Decision state (conservative)
     // -----------------------
     const state = {
-      intent: "rental",
-      constraints: {
+      intent: "rental", // rental | inspection | contact
+      confirmed: {
         location: "Monash Clayton 周边",
         roomType: null,      // Single / Ensuite
         budgetMin: null,
         budgetMax: null,
-        moveIn: null,        // e.g., 下周 / 本周六
-        walkTime: null       // e.g., 10 分钟内
+        moveIn: null,        // 下周 / 本周六 / 日期
+        walkTime: null       // 10 分钟内
       },
+      missing: [],
       clarifyingAsked: 0,
       lead: {
         created: false,
@@ -198,114 +211,126 @@
     };
 
     // -----------------------
-    // Tiny parser (conservative)
+    // Minimal parser (no guessing beyond explicit text)
     // -----------------------
     function parseInput(text){
       const t = text.toLowerCase();
 
       // room type
-      if (t.includes("ensuite") || text.includes("独立卫浴") || text.includes("套房")) state.constraints.roomType = "Ensuite（独立卫浴）";
-      if (t.includes("single") || text.includes("单人间") || text.includes("单人房")) state.constraints.roomType = "Single（单人间）";
+      if (t.includes("ensuite") || text.includes("独立卫浴") || text.includes("套房")) state.confirmed.roomType = "Ensuite（独立卫浴）";
+      if (t.includes("single") || text.includes("单人间") || text.includes("单人房")) state.confirmed.roomType = "Single（单人间）";
 
-      // budget (supports 280-320, 280–320, $280-$320)
+      // budget range (280-320 / 280–320 / 280~320 / 280到320)
       const m = text.match(/(\d{2,4})\s*[–\-~到]\s*(\d{2,4})/);
       if (m){
-        state.constraints.budgetMin = parseInt(m[1],10);
-        state.constraints.budgetMax = parseInt(m[2],10);
+        const a = parseInt(m[1],10);
+        const b = parseInt(m[2],10);
+        if (!Number.isNaN(a) && !Number.isNaN(b)){
+          state.confirmed.budgetMin = Math.min(a,b);
+          state.confirmed.budgetMax = Math.max(a,b);
+        }
       } else {
         // single number like "300/周"
         const s = text.match(/(\d{2,4})\s*(澳币|aud|\$)?\s*\/?\s*周/);
         if (s){
           const v = parseInt(s[1],10);
-          state.constraints.budgetMin = v;
-          state.constraints.budgetMax = v;
+          if (!Number.isNaN(v)){
+            state.confirmed.budgetMin = v;
+            state.confirmed.budgetMax = v;
+          }
         }
       }
 
       // move-in
-      if (text.includes("下周")) state.constraints.moveIn = "下周";
-      if (text.includes("本周") || text.includes("这周")) state.constraints.moveIn = "本周";
-      if (text.includes("周六")) state.constraints.moveIn = "周六";
-      if (text.includes("周日")) state.constraints.moveIn = "周日";
+      if (text.includes("下周")) state.confirmed.moveIn = "下周";
+      else if (text.includes("本周") || text.includes("这周")) state.confirmed.moveIn = "本周";
+      else if (text.includes("周六")) state.confirmed.moveIn = "周六";
+      else if (text.includes("周日")) state.confirmed.moveIn = "周日";
 
       // walk time
       const wt = text.match(/(\d{1,2})\s*分钟/);
-      if (wt) state.constraints.walkTime = wt[1] + " 分钟内";
+      if (wt) state.confirmed.walkTime = wt[1] + " 分钟内";
 
       // intent shortcuts
-      if (text.includes("预约") || text.toLowerCase().includes("inspection")) state.intent = "inspection";
+      if (text.includes("预约") || t.includes("inspection")) state.intent = "inspection";
       if (text.includes("联系方式") || text.includes("留资") || text.includes("联系我")) state.intent = "contact";
     }
 
-    function missingFields(){
-      const c = state.constraints;
+    function computeMissing(){
+      const c = state.confirmed;
       const miss = [];
       if (!c.roomType) miss.push("房型（Single / Ensuite）");
       if (!c.budgetMin) miss.push("预算（每周 AUD 区间）");
       if (!c.moveIn) miss.push("入住时间（例如：下周/本周六）");
+      state.missing = miss;
       return miss;
     }
 
-    function summaryBlock(){
-      const c = state.constraints;
-      const b = (c.budgetMin && c.budgetMax) ? `$${c.budgetMin}–$${c.budgetMax}/周` : "未提供";
-      return [
-        "好的，我先把已知信息整理成「可决策」格式：",
-        `位置：${c.location}`,
-        `房型：${c.roomType || "未确认"}`,
-        `预算：${b}`,
-        `入住：${c.moveIn || "未确认"}`,
-        c.walkTime ? `通勤：步行 ${c.walkTime} 到 Monash Clayton` : ""
-      ].filter(Boolean).join("\n");
+    function budgetText(){
+      const c = state.confirmed;
+      if (c.budgetMin && c.budgetMax) return `AUD ${c.budgetMin}–${c.budgetMax} / 周`;
+      return "未提供";
+    }
+
+    function decisionDraft(){
+      const c = state.confirmed;
+      const confirmed = [
+        "【可执行决策草案｜V2.1】",
+        "",
+        "✅ 已确认信息（系统将据此执行）：",
+        `• 位置：${c.location}`,
+        `• 房型偏好：${c.roomType || "未确认"}`,
+        `• 预算区间：${budgetText()}`,
+        `• 入住时间：${c.moveIn || "未确认"}`,
+        c.walkTime ? `• 通勤约束：步行 ${c.walkTime} 到 Monash Clayton` : null,
+        "",
+      ].filter(Boolean);
+
+      const miss = computeMissing();
+      const missing = miss.length ? [
+        "🟨 待确认信息（缺失会降低匹配精度）：",
+        ...miss.slice(0,3).map(x => `• ${x}`),
+        ""
+      ] : [];
+
+      const next = [
+        "➡️ 系统下一步可执行动作（Demo）：",
+        "1) 生成“可看房房源池”（真实产品将来自房源库）",
+        "2) 安排 Open Inspection / 私约",
+        "3) 生成线索卡并交给运营/顾问跟进",
+      ];
+
+      return confirmed.concat(missing).concat(next).join("\n");
     }
 
     function askClarifying(){
-      const miss = missingFields();
-      const q = miss.slice(0, 3).map(x => `• 你希望的${x}是？`).join("\n");
+      const miss = state.missing.slice(0,3);
       state.clarifyingAsked += 1;
-      return `为了避免我猜测导致错误，我需要补充最多 3 个关键信息：\n${q}`;
-    }
-
-    function recommendNext(){
-      // No fabricated listing facts. Provide action-oriented options.
-      const c = state.constraints;
-      const b = (c.budgetMin && c.budgetMax) ? `$${c.budgetMin}–$${c.budgetMax}/周` : "预算待确认";
-      const rt = c.roomType || "房型待确认";
-      const mv = c.moveIn || "入住时间待确认";
-
       return [
-        "太好了，你的信息已足够进入「推荐/看房」阶段。",
+        "为了避免我猜测导致错误，我需要补充最多 3 个关键信息：",
+        ...miss.map(x => `• 你希望的${x}是？`),
         "",
-        "下一步建议（Demo）：",
-        "• 点击「预约看房」：安排 Open Inspection 或私约时间",
-        "• 或点击「留下联系方式」：我将把需求整理成线索，交给顾问跟进",
-        "",
-        "你当前偏好（将用于线索摘要）：",
-        `• ${rt} · ${b} · ${mv} · ${c.location}${c.walkTime ? " · 步行"+c.walkTime : ""}`
+        "你也可以直接点击下方按钮进入流程（Demo 会记录为“待确认”）。"
       ].join("\n");
     }
 
     function routeIntent(){
       if (state.intent === "inspection"){
-        add("assistant", "收到，你想预约看房。请点击下方「预约看房（Demo）」我会生成预约请求。");
-        return;
-      }
-      if (state.intent === "contact"){
-        add("assistant", "收到，你想留下联系方式。请点击下方「留下联系方式（Demo）」我会生成线索并记录联系人。");
-        return;
+        add("assistant", "收到：你要进入看房流程。你可以直接点击下方「进入看房流程（Demo）」生成预约请求。");
+      } else if (state.intent === "contact"){
+        add("assistant", "收到：你要生成客户需求记录。请点击下方「生成客户需求记录（Demo）」我会生成线索卡并记录联系方式。");
       }
     }
 
     // -----------------------
-    // Lead generator (front-end only)
+    // Lead card (front-end only)
     // -----------------------
     function renderLead(){
-      const c = state.constraints;
-      const b = (c.budgetMin && c.budgetMax) ? `$${c.budgetMin}–$${c.budgetMax}/周` : "未提供";
+      const c = state.confirmed;
       const lead = {
         location: c.location,
         roomType: c.roomType || "未确认",
-        budget: b,
+        budget: budgetText(),
         moveIn: c.moveIn || "未确认",
         walk: c.walkTime || "未指定",
         contact: state.lead.contact || "未留下",
@@ -314,8 +339,10 @@
 
       leadBox.style.display = "block";
       leadBox.innerHTML = `
-        <b>✅ Lead Summary（Demo 生成）</b>
+        <b>✅ CRM Lead Card（Demo 生成）</b>
         <div class="small">
+          <span class="tag">Decision Layer Output</span>
+          <span class="tag">No Hallucination</span><br/><br/>
           位置：${lead.location}<br/>
           房型：${lead.roomType}<br/>
           预算：${lead.budget}<br/>
@@ -338,37 +365,36 @@
       inp.value = "";
 
       parseInput(text);
-
-      // If user directly expresses intent, route it
       routeIntent();
 
-      // Provide summary
-      add("assistant", summaryBlock());
+      add("assistant", decisionDraft());
 
-      // Ask clarifying if needed (≤3 questions total as a principle)
-      const miss = missingFields();
-      if (miss.length > 0){
+      // If missing, ask clarifying (≤3 principle)
+      if (state.missing.length > 0){
         add("assistant", askClarifying());
         setStatus("Waiting");
         return;
       }
 
-      // Otherwise recommend next
-      add("assistant", recommendNext());
+      add("assistant",
+        "✅ 约束已足够，系统可进入执行。\n" +
+        "请点击：\n" +
+        "• 「进入看房流程」安排 inspection\n" +
+        "• 或「生成客户需求记录」生成线索卡交给顾问"
+      );
       setStatus("Ready");
     }
 
     // -----------------------
-    // Buttons (the main fix)
+    // Buttons (action layer)
     // -----------------------
     if (inspectBtn){
       inspectBtn.onclick = () => {
-        // Create a demo inspection request
         const when = prompt("【Demo】你希望看房时间？（例如：本周六 2pm / 下周二上午）");
         state.lead.inspection = when ? when : "已提交（待确认时间）";
         add("assistant",
-          "【Demo】已生成预约看房请求 ✅\n" +
-          "下一步：顾问将确认时间并发送地址/注意事项。"
+          "【Action】已生成看房预约请求 ✅\n" +
+          "下一步：顾问确认时间并发送地址/注意事项（真实产品将自动化）。"
         );
         renderLead();
       };
@@ -378,13 +404,13 @@
       contactBtn.onclick = () => {
         const contact = prompt("【Demo】请输入联系方式（微信 / 手机 / 邮箱）：");
         if (!contact){
-          add("assistant", "【Demo】未输入联系方式。我可以先继续给你建议，或你稍后再点击「留下联系方式」。");
+          add("assistant", "【Action】未输入联系方式。你可以稍后再点「生成客户需求记录」，或继续补充需求。");
           return;
         }
         state.lead.contact = contact;
         add("assistant",
-          "【Demo】联系方式已记录 ✅\n" +
-          "我已把你的需求整理成线索，将交给顾问跟进。"
+          "【Action】已生成客户需求记录（Lead）✅\n" +
+          "我会把该线索交给运营/顾问跟进（真实产品将写入 CRM）。"
         );
         renderLead();
       };
@@ -404,8 +430,8 @@
 
     // welcome
     add("assistant",
-      "你好！我是 LeaseMind（V2 Demo，本地模拟）。\n" +
-      "我会用 ≤3 个补问把你的租房需求变成“可执行决策”，并引导到预约看房或留资。\n\n" +
+      "你好！我是 LeaseMind（V2.1 Investor Demo，本地模拟）。\n" +
+      "我不会编造房源事实；我会把你的需求收敛为“已确认约束 + 待确认缺口 + 可执行动作”。\n\n" +
       "你可以直接说：预算/房型/入住时间/离 Monash Clayton 多近。"
     );
     setStatus("Ready");
