@@ -1,604 +1,414 @@
 <!doctype html>
 <html lang="zh">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LeaseMind V2 Demo | AI Rental Concierge</title>
-    <style>
-      :root {
-        --border: #e6e6e6;
-        --text: #111;
-        --muted: rgba(0,0,0,.65);
-        --bg: #fff;
-        --soft: #fafafa;
-        --chip: #f3f3f3;
-        --shadow: 0 8px 24px rgba(0,0,0,.06);
-        --radius: 14px;
-      }
-      body {
-        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
-        color: var(--text);
-        background: var(--bg);
-        max-width: 980px;
-        margin: 24px auto;
-        padding: 0 14px 40px;
-        line-height: 1.5;
-      }
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
-      }
-      .badge {
-        font-size: 12px;
-        padding: 6px 10px;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        background: #fff;
-      }
-      h1 {
-        font-size: 26px;
-        margin: 6px 0 6px;
-        letter-spacing: -0.2px;
-      }
-      .sub {
-        color: var(--muted);
-        margin: 0 0 14px;
-        font-size: 14px;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 14px;
-      }
-      @media (max-width: 900px) {
-        .grid { grid-template-columns: 1fr; }
-      }
-      .card {
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 16px;
-        background: #fff;
-        box-shadow: var(--shadow);
-      }
-      .card h2 {
-        font-size: 15px;
-        margin: 0 0 8px;
-      }
-      .card p, .card li {
-        color: var(--muted);
-        font-size: 14px;
-      }
-      .kpi {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-top: 12px;
-      }
-      .kpi .box {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px 10px;
-        background: var(--soft);
-      }
-      .kpi .num {
-        font-size: 16px;
-        font-weight: 650;
-        color: var(--text);
-      }
-      .kpi .lbl {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 4px;
-      }
-      .sep {
-        height: 1px;
-        background: var(--border);
-        margin: 14px 0;
-      }
-      .chat {
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 14px;
-        background: #fff;
-        box-shadow: var(--shadow);
-      }
-      .chathead {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-      }
-      .chathead .title {
-        font-weight: 650;
-        font-size: 14px;
-      }
-      .chathead .mini {
-        color: var(--muted);
-        font-size: 12px;
-      }
-      .msgs {
-        max-height: 420px;
-        overflow: auto;
-        padding-right: 4px;
-      }
-      .msg {
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 10px 12px;
-        margin: 8px 0;
-        white-space: pre-wrap;
-        background: #fff;
-      }
-      .msg.user {
-        margin-left: auto;
-        background: var(--soft);
-        max-width: 92%;
-      }
-      .msg.ai {
-        margin-right: auto;
-        max-width: 92%;
-      }
-      .row {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-      }
-      input {
-        flex: 1;
-        padding: 10px 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        outline: none;
-      }
-      button {
-        padding: 10px 14px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: #fff;
-        cursor: pointer;
-      }
-      button:hover { background: var(--soft); }
-      button:disabled { opacity: .55; cursor: not-allowed; }
-      .chips {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 10px;
-      }
-      .chip {
-        font-size: 12px;
-        padding: 8px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: var(--chip);
-        cursor: pointer;
-      }
-      .chip:hover { filter: brightness(0.98); }
-      .cta {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 10px;
-      }
-      .cta a {
-        display: inline-block;
-        text-decoration: none;
-        color: var(--text);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px 12px;
-        background: #fff;
-      }
-      .cta a:hover { background: var(--soft); }
-      .foot {
-        margin-top: 16px;
-        color: var(--muted);
-        font-size: 12px;
-      }
-      .tag {
-        font-size: 12px;
-        padding: 4px 8px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: #fff;
-        margin-left: 6px;
-      }
-      .mono {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        font-size: 12px;
-        color: var(--muted);
-      }
-    </style>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeaseMind V2 Demo | AI Rental Decision Layer</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280;
+      --line:#e5e7eb; --blue:#2563eb; --green:#16a34a; --amber:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg); color:var(--text);}
+    .wrap{max-width:1180px; margin:18px auto; padding:0 14px;}
+    .topbar{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:12px;}
+    .brand{font-weight:800; font-size:18px;}
+    .sub{color:var(--muted); font-size:12px; margin-top:4px;}
+    .mode{font-size:12px; color:var(--muted);}
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px;}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,.04);}
+    .card-h{padding:12px 14px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;}
+    .card-b{padding:14px;}
+    .pill{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line);
+      border-radius:999px; padding:6px 10px; font-size:12px; color:var(--muted); background:#fafafa;}
+    .pill b{color:var(--text)}
+    .chat{height:420px; overflow:auto; padding:6px 2px;}
+    .msg{max-width:92%; padding:10px 12px; border-radius:12px; margin:8px 0; white-space:pre-wrap; line-height:1.35;}
+    .assistant{background:#f3f4f6; border:1px solid #eef2f7;}
+    .user{background:#eff6ff; border:1px solid #dbeafe; margin-left:auto;}
+    .hint{color:var(--muted); font-size:12px; margin:0 0 10px 0;}
+    .row{display:flex; gap:10px; margin-top:10px;}
+    input[type="text"]{flex:1; padding:12px 12px; border-radius:12px; border:1px solid var(--line); outline:none;}
+    button{padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; cursor:pointer; font-weight:700;}
+    button:hover{border-color:#cbd5e1}
+    button.primary{background:var(--blue); color:#fff; border-color:var(--blue);}
+    button.primary:hover{filter:brightness(.98)}
+    button.ghost{background:#fff;}
+    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+    .chip{font-size:12px; border:1px solid var(--line); background:#fff; border-radius:999px; padding:8px 10px; cursor:pointer;}
+    .chip:hover{border-color:#cbd5e1}
+    .actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+    .actions button{flex:1; min-width:160px;}
+    .note{font-size:12px; color:var(--muted); margin-top:10px; line-height:1.35;}
+    .kpi{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;}
+    .kpi .box{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:#fff;}
+    .kpi .box .t{font-size:12px; color:var(--muted);}
+    .kpi .box .v{font-size:16px; font-weight:800; margin-top:3px;}
+    .lead{border:1px dashed #cbd5e1; border-radius:12px; padding:10px 12px; background:#fafafa; margin-top:10px;}
+    .lead b{display:block; margin-bottom:6px;}
+    .small{font-size:12px; color:var(--muted);}
+    .ok{color:var(--green); font-weight:700;}
+    .warn{color:#b45309; font-weight:700;}
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr;}
+      .chat{height:380px;}
+    }
+  </style>
+</head>
 
-  <body>
+<body>
+  <div class="wrap">
     <div class="topbar">
-      <div class="badge">V2 Demo · Investor Preview</div>
-      <div class="badge">Monash Clayton · Student Housing</div>
+      <div>
+        <div class="brand">LeaseMind <span class="pill"><b>V2</b> Demo</span></div>
+        <div class="sub">AI Rental Decision Layer · 本地模拟（不依赖 API）· 用于展示“决策→行动”闭环</div>
+      </div>
+      <div class="mode">Mode: <b>Demo（中文）</b> · Max Clarifying Qs: <b>≤3</b></div>
     </div>
-
-    <h1>LeaseMind – 留学生租房决策 AI 助手</h1>
-    <p class="sub">
-      将零散、重复的租房问题，转化为 <b>结构化决策建议</b> 与 <b>可执行下一步</b>（看房/留资/跟进）。
-      <span class="tag">本页为本地模拟 AI，不依赖 API</span>
-    </p>
 
     <div class="grid">
-      <!-- Left: Chat -->
-      <div class="chat">
-        <div class="chathead">
-          <div>
-            <div class="title">Live Demo Chat <span class="tag">Local AI Simulator</span></div>
-            <div class="mini">输入需求 → AI 补问关键点 → 给出建议与下一步</div>
+      <!-- LEFT: Chat -->
+      <div class="card">
+        <div class="card-h">
+          <div><b>Live Demo Chat</b> <span class="pill">Local AI Simulator</span></div>
+          <div class="pill">Status: <b id="status">Ready</b></div>
+        </div>
+        <div class="card-b">
+          <p class="hint">输入需求 → AI 补问 ≤3 次 → 输出结构化建议 → 点击 <b>预约看房</b> / <b>留下联系方式</b> 完成闭环。</p>
+
+          <div id="chat" class="chat"></div>
+
+          <div class="chips">
+            <div class="chip" data-fill="我想在 Monash Clayton 附近找单人间，预算 280–320 澳币/周，下周入住">试试：单人间 280–320/周 下周入住</div>
+            <div class="chip" data-fill="我更倾向独立卫浴（Ensuite），走路 10 分钟内到 Monash Clayton，预算 320–380/周">试试：Ensuite 10 分钟内 320–380/周</div>
+            <div class="chip" data-fill="我想先预约 open inspection，本周六下午有空">试试：预约 open inspection</div>
+            <div class="chip" data-fill="我想留下联系方式，让顾问联系我">试试：留下联系方式</div>
           </div>
-          <div class="mini mono" id="mode">Mode: Demo</div>
-        </div>
 
-        <div class="msgs" id="msgs"></div>
+          <div class="row">
+            <input id="inp" type="text" placeholder="例如：我想在 Monash Clayton 附近找单人间，预算 280–320/周，下周入住…" />
+            <button id="btnSend" class="primary">发送</button>
+          </div>
 
-        <div class="chips" id="chips"></div>
+          <div class="actions">
+            <button id="btn-inspect" class="ghost">预约看房（Demo）</button>
+            <button id="btn-contact" class="ghost">留下联系方式（Demo）</button>
+          </div>
 
-        <div class="row">
-          <input
-            id="inp"
-            placeholder="试试：我想在 Monash Clayton 附近找单人间，预算 280–320/周，下周入住"
-          />
-          <button id="btn">发送</button>
-        </div>
+          <div id="leadBox" class="lead" style="display:none;"></div>
 
-        <div class="cta">
-          <!-- 你把下面两个链接换成你自己的 Google Form/WhatsApp/WeChat -->
-          <a href="#" id="book">📅 预约看房（Demo）</a>
-          <a href="#" id="leave">📩 留下联系方式（Demo）</a>
-        </div>
-
-        <div class="foot">
-          说明：此版本用于演示“交互逻辑与文案表达”。后续可无缝替换为真实 LLM（OpenAI）与房源数据。
+          <div class="note">
+            说明：此版本用于展示交互逻辑与文案表达，后续可无缝替换为真实 LLM（OpenAI）与房源数据库 / CRM 工作流。<br/>
+            <span class="warn">本地模拟不会生成任何“虚构房源事实”</span>：若缺信息会先补问或提示转人工。
+          </div>
         </div>
       </div>
 
-      <!-- Right: Investor copy -->
+      <!-- RIGHT: Investor panel -->
       <div class="card">
-        <h2>What does LeaseMind do?</h2>
-        <p>
-          LeaseMind is an AI rental concierge for international students.
-          It sits <b>before listings and agents</b> — turning natural language needs into
-          structured decisions and next actions.
-        </p>
-
-        <div class="sep"></div>
-
-        <h2>The problem we solve</h2>
-        <ul>
-          <li><b>Information overload</b>：房源多、信息杂、决策成本高</li>
-          <li><b>High friction</b>：反复提问、响应慢、跟进断层</li>
-          <li><b>No decision layer</b>：缺少把“问题”变成“下一步”的系统</li>
-        </ul>
-
-        <div class="sep"></div>
-
-        <h2>What this demo validates</h2>
-        <ul>
-          <li>意图识别：预算/房型/距离/入住时间</li>
-          <li>最小补问：最多 3 个关键问题</li>
-          <li>行动引导：看房、留资、继续补充信息</li>
-        </ul>
-
-        <div class="kpi">
-          <div class="box">
-            <div class="num">V2</div>
-            <div class="lbl">互动路径可演示</div>
+        <div class="card-h"><b>Investor View</b> <span class="pill">1-page narrative</span></div>
+        <div class="card-b">
+          <h3 style="margin:0 0 8px 0;">What does LeaseMind do?</h3>
+          <div class="small">
+            LeaseMind sits <b>before listings and agents</b>, turning messy rental questions into <b>structured decisions</b> and <b>next actions</b>.
           </div>
-          <div class="box">
-            <div class="num">≤ 3</div>
-            <div class="lbl">最小澄清问题</div>
+
+          <h3 style="margin:14px 0 8px 0;">The problem we solve</h3>
+          <ul class="small" style="margin:0; padding-left:18px; line-height:1.5;">
+            <li><b>Information overload</b>: users can’t compare options rationally</li>
+            <li><b>High friction</b>: repeated Q&A wastes consultant time</li>
+            <li><b>No decision layer</b>:咨询缺少标准化“收敛到行动”</li>
+          </ul>
+
+          <h3 style="margin:14px 0 8px 0;">What this demo validates</h3>
+          <ul class="small" style="margin:0; padding-left:18px; line-height:1.5;">
+            <li>意图识别：预算 / 房型 / 距离 / 入住时间</li>
+            <li>最小补问：≤3 个澄清问题</li>
+            <li>行动引导：预约看房、留资、转人工</li>
+          </ul>
+
+          <div class="kpi">
+            <div class="box">
+              <div class="t">V2</div>
+              <div class="v">Local Simulator</div>
+            </div>
+            <div class="box">
+              <div class="t">Max Clarifying</div>
+              <div class="v">≤ 3</div>
+            </div>
           </div>
-          <div class="box">
-            <div class="num">Next</div>
-            <div class="lbl">预约 / 留资 CTA</div>
-          </div>
-        </div>
 
-        <div class="sep"></div>
+          <h3 style="margin:14px 0 8px 0;">Next phase</h3>
+          <ul class="small" style="margin:0; padding-left:18px; line-height:1.5;">
+            <li>Replace simulator with real LLM + guardrails</li>
+            <li>Live property database integration</li>
+            <li>Inspection scheduling automation</li>
+            <li>CRM workflow for agents/operators</li>
+          </ul>
 
-        <h2>Next phase</h2>
-        <p>
-          Replace Local Simulator with real LLM + listings data:
-          <br />• Live property database integration
-          <br />• Inspection scheduling automation
-          <br />• CRM workflow for agents / operators
-          <br />• Expansion to multi-campus & cities
-        </p>
-
-        <div class="foot">
-          LeaseMind © 2025 · For discussion and evaluation purposes only
+          <div class="small" style="margin-top:12px;">LeaseMind © 2026 · For discussion and evaluation</div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script>
-      // ======= Local AI Simulator (no API, no JSON, no errors) =======
-      const msgs = document.getElementById("msgs");
-      const chips = document.getElementById("chips");
-      const inp = document.getElementById("inp");
-      const btn = document.getElementById("btn");
-      const mode = document.getElementById("mode");
-      const book = document.getElementById("book");
-      const leave = document.getElementById("leave");
+  <script>
+    // -----------------------
+    // Chat helpers
+    // -----------------------
+    const chat = document.getElementById("chat");
+    const inp  = document.getElementById("inp");
+    const btn  = document.getElementById("btnSend");
+    const statusEl = document.getElementById("status");
 
-      // You can replace these with real links (Google Form, WhatsApp, WeChat, Calendly)
-      const INSPECTION_URL = "#";
-      const LEAD_URL = "#";
-      book.href = INSPECTION_URL;
-      leave.href = LEAD_URL;
+    const leadBox = document.getElementById("leadBox");
+    const inspectBtn = document.getElementById("btn-inspect");
+    const contactBtn = document.getElementById("btn-contact");
 
-      // Simple session state (no persistence)
-      const state = {
-        language: "zh", // "zh" | "en"
-        needs: {
-          suburb: "Clayton",
-          near: "Monash University Clayton",
-          roomType: null, // single/ensuite/twin/studio
-          budgetMin: null,
-          budgetMax: null,
-          moveIn: null,
-          lease: null
-        },
-        turn: 0
+    function add(role, text){
+      const div = document.createElement("div");
+      div.className = "msg " + (role === "user" ? "user" : "assistant");
+      div.innerText = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+    function setStatus(s){ statusEl.innerText = s; }
+
+    // -----------------------
+    // Minimal "decision layer" state
+    // -----------------------
+    const state = {
+      intent: "rental",
+      constraints: {
+        location: "Monash Clayton 周边",
+        roomType: null,      // Single / Ensuite
+        budgetMin: null,
+        budgetMax: null,
+        moveIn: null,        // e.g., 下周 / 本周六
+        walkTime: null       // e.g., 10 分钟内
+      },
+      clarifyingAsked: 0,
+      lead: {
+        created: false,
+        contact: null,
+        inspection: null
+      }
+    };
+
+    // -----------------------
+    // Tiny parser (conservative)
+    // -----------------------
+    function parseInput(text){
+      const t = text.toLowerCase();
+
+      // room type
+      if (t.includes("ensuite") || text.includes("独立卫浴") || text.includes("套房")) state.constraints.roomType = "Ensuite（独立卫浴）";
+      if (t.includes("single") || text.includes("单人间") || text.includes("单人房")) state.constraints.roomType = "Single（单人间）";
+
+      // budget (supports 280-320, 280–320, $280-$320)
+      const m = text.match(/(\d{2,4})\s*[–\-~到]\s*(\d{2,4})/);
+      if (m){
+        state.constraints.budgetMin = parseInt(m[1],10);
+        state.constraints.budgetMax = parseInt(m[2],10);
+      } else {
+        // single number like "300/周"
+        const s = text.match(/(\d{2,4})\s*(澳币|aud|\$)?\s*\/?\s*周/);
+        if (s){
+          const v = parseInt(s[1],10);
+          state.constraints.budgetMin = v;
+          state.constraints.budgetMax = v;
+        }
+      }
+
+      // move-in
+      if (text.includes("下周")) state.constraints.moveIn = "下周";
+      if (text.includes("本周") || text.includes("这周")) state.constraints.moveIn = "本周";
+      if (text.includes("周六")) state.constraints.moveIn = "周六";
+      if (text.includes("周日")) state.constraints.moveIn = "周日";
+
+      // walk time
+      const wt = text.match(/(\d{1,2})\s*分钟/);
+      if (wt) state.constraints.walkTime = wt[1] + " 分钟内";
+
+      // intent shortcuts
+      if (text.includes("预约") || text.toLowerCase().includes("inspection")) state.intent = "inspection";
+      if (text.includes("联系方式") || text.includes("留资") || text.includes("联系我")) state.intent = "contact";
+    }
+
+    function missingFields(){
+      const c = state.constraints;
+      const miss = [];
+      if (!c.roomType) miss.push("房型（Single / Ensuite）");
+      if (!c.budgetMin) miss.push("预算（每周 AUD 区间）");
+      if (!c.moveIn) miss.push("入住时间（例如：下周/本周六）");
+      return miss;
+    }
+
+    function summaryBlock(){
+      const c = state.constraints;
+      const b = (c.budgetMin && c.budgetMax) ? `$${c.budgetMin}–$${c.budgetMax}/周` : "未提供";
+      return [
+        "好的，我先把已知信息整理成「可决策」格式：",
+        `位置：${c.location}`,
+        `房型：${c.roomType || "未确认"}`,
+        `预算：${b}`,
+        `入住：${c.moveIn || "未确认"}`,
+        c.walkTime ? `通勤：步行 ${c.walkTime} 到 Monash Clayton` : ""
+      ].filter(Boolean).join("\n");
+    }
+
+    function askClarifying(){
+      const miss = missingFields();
+      const q = miss.slice(0, 3).map(x => `• 你希望的${x}是？`).join("\n");
+      state.clarifyingAsked += 1;
+      return `为了避免我猜测导致错误，我需要补充最多 3 个关键信息：\n${q}`;
+    }
+
+    function recommendNext(){
+      // No fabricated listing facts. Provide action-oriented options.
+      const c = state.constraints;
+      const b = (c.budgetMin && c.budgetMax) ? `$${c.budgetMin}–$${c.budgetMax}/周` : "预算待确认";
+      const rt = c.roomType || "房型待确认";
+      const mv = c.moveIn || "入住时间待确认";
+
+      return [
+        "太好了，你的信息已足够进入「推荐/看房」阶段。",
+        "",
+        "下一步建议（Demo）：",
+        "• 点击「预约看房」：安排 Open Inspection 或私约时间",
+        "• 或点击「留下联系方式」：我将把需求整理成线索，交给顾问跟进",
+        "",
+        "你当前偏好（将用于线索摘要）：",
+        `• ${rt} · ${b} · ${mv} · ${c.location}${c.walkTime ? " · 步行"+c.walkTime : ""}`
+      ].join("\n");
+    }
+
+    function routeIntent(){
+      if (state.intent === "inspection"){
+        add("assistant", "收到，你想预约看房。请点击下方「预约看房（Demo）」我会生成预约请求。");
+        return;
+      }
+      if (state.intent === "contact"){
+        add("assistant", "收到，你想留下联系方式。请点击下方「留下联系方式（Demo）」我会生成线索并记录联系人。");
+        return;
+      }
+    }
+
+    // -----------------------
+    // Lead generator (front-end only)
+    // -----------------------
+    function renderLead(){
+      const c = state.constraints;
+      const b = (c.budgetMin && c.budgetMax) ? `$${c.budgetMin}–$${c.budgetMax}/周` : "未提供";
+      const lead = {
+        location: c.location,
+        roomType: c.roomType || "未确认",
+        budget: b,
+        moveIn: c.moveIn || "未确认",
+        walk: c.walkTime || "未指定",
+        contact: state.lead.contact || "未留下",
+        inspection: state.lead.inspection || "未预约"
       };
 
-      function add(role, text) {
-        const div = document.createElement("div");
-        div.className = "msg " + (role === "user" ? "user" : "ai");
-        div.textContent = text;
-        msgs.appendChild(div);
-        msgs.scrollTop = msgs.scrollHeight;
+      leadBox.style.display = "block";
+      leadBox.innerHTML = `
+        <b>✅ Lead Summary（Demo 生成）</b>
+        <div class="small">
+          位置：${lead.location}<br/>
+          房型：${lead.roomType}<br/>
+          预算：${lead.budget}<br/>
+          入住：${lead.moveIn}<br/>
+          通勤：${lead.walk}<br/>
+          联系方式：<span class="${state.lead.contact ? "ok" : ""}">${lead.contact}</span><br/>
+          看房预约：<span class="${state.lead.inspection ? "ok" : ""}">${lead.inspection}</span>
+        </div>
+      `;
+    }
+
+    // -----------------------
+    // Main send
+    // -----------------------
+    async function send(){
+      const text = inp.value.trim();
+      if(!text) return;
+      setStatus("Thinking…");
+      add("user", text);
+      inp.value = "";
+
+      parseInput(text);
+
+      // If user directly expresses intent, route it
+      routeIntent();
+
+      // Provide summary
+      add("assistant", summaryBlock());
+
+      // Ask clarifying if needed (≤3 questions total as a principle)
+      const miss = missingFields();
+      if (miss.length > 0){
+        add("assistant", askClarifying());
+        setStatus("Waiting");
+        return;
       }
 
-      function setChips(list) {
-        chips.innerHTML = "";
-        (list || []).forEach((t) => {
-          const b = document.createElement("button");
-          b.className = "chip";
-          b.type = "button";
-          b.textContent = t;
-          b.onclick = () => send(t);
-          chips.appendChild(b);
-        });
-      }
+      // Otherwise recommend next
+      add("assistant", recommendNext());
+      setStatus("Ready");
+    }
 
-      function detectLanguage(text) {
-        // if mostly ASCII letters -> EN
-        const ascii = (text.match(/[A-Za-z]/g) || []).length;
-        const han = (text.match(/[\u4e00-\u9fff]/g) || []).length;
-        return ascii > han ? "en" : "zh";
-      }
+    // -----------------------
+    // Buttons (the main fix)
+    // -----------------------
+    if (inspectBtn){
+      inspectBtn.onclick = () => {
+        // Create a demo inspection request
+        const when = prompt("【Demo】你希望看房时间？（例如：本周六 2pm / 下周二上午）");
+        state.lead.inspection = when ? when : "已提交（待确认时间）";
+        add("assistant",
+          "【Demo】已生成预约看房请求 ✅\n" +
+          "下一步：顾问将确认时间并发送地址/注意事项。"
+        );
+        renderLead();
+      };
+    }
 
-      function parseBudget(text) {
-        // matches: 280-320, 280–320, $280-$320, 280 320
-        const m = text
-          .replace(/—/g, "-")
-          .replace(/–/g, "-")
-          .match(/(\d{2,4})\s*[-~]\s*(\d{2,4})/);
-        if (m) return { min: Number(m[1]), max: Number(m[2]) };
-
-        // single number: 300/week
-        const m2 = text.match(/(\d{2,4})\s*(aud|a\$|\$)?\s*(\/?\s*week|\/?\s*w|每周|\/周)?/i);
-        if (m2) return { min: Number(m2[1]), max: Number(m2[1]) };
-
-        return null;
-      }
-
-      function parseRoomType(text) {
-        const t = text.toLowerCase();
-        if (t.includes("ensuite") || text.includes("独立卫浴") || text.includes("套房")) return "ensuite";
-        if (t.includes("studio") || text.includes("单间公寓")) return "studio";
-        if (t.includes("twin") || text.includes("双人间")) return "twin";
-        if (t.includes("single") || text.includes("单人间")) return "single";
-        return null;
-      }
-
-      function parseMoveIn(text) {
-        // Very simple: "下周" / "本周" / date-like
-        if (text.includes("下周")) return "next_week";
-        if (text.includes("本周") || text.includes("这周")) return "this_week";
-        const m = text.match(/(20\d{2})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
-        if (m) return `${m[1]}-${String(m[2]).padStart(2, "0")}-${String(m[3]).padStart(2, "0")}`;
-        return null;
-      }
-
-      function maybeUpdateNeeds(userText) {
-        state.language = detectLanguage(userText);
-        mode.textContent = "Mode: Demo (" + (state.language === "zh" ? "中文" : "EN") + ")";
-
-        const b = parseBudget(userText);
-        if (b) {
-          state.needs.budgetMin = b.min;
-          state.needs.budgetMax = b.max;
+    if (contactBtn){
+      contactBtn.onclick = () => {
+        const contact = prompt("【Demo】请输入联系方式（微信 / 手机 / 邮箱）：");
+        if (!contact){
+          add("assistant", "【Demo】未输入联系方式。我可以先继续给你建议，或你稍后再点击「留下联系方式」。");
+          return;
         }
+        state.lead.contact = contact;
+        add("assistant",
+          "【Demo】联系方式已记录 ✅\n" +
+          "我已把你的需求整理成线索，将交给顾问跟进。"
+        );
+        renderLead();
+      };
+    }
 
-        const rt = parseRoomType(userText);
-        if (rt) state.needs.roomType = rt;
-
-        const mi = parseMoveIn(userText);
-        if (mi) state.needs.moveIn = mi;
-
-        // suburb hints
-        const s = userText.toLowerCase();
-        const suburbs = ["clayton", "oakleigh", "huntingdale", "notting hill", "mount waverley", "caulfield"];
-        for (const sub of suburbs) {
-          if (s.includes(sub)) {
-            state.needs.suburb = sub.charAt(0).toUpperCase() + sub.slice(1);
-            break;
-          }
-        }
-      }
-
-      function buildClarifyingQuestions() {
-        const q = [];
-        if (!state.needs.roomType) q.push(state.language === "zh" ? "你更想要单人间还是独立卫浴（Ensuite）？" : "Do you prefer a single room or an ensuite?");
-        if (!state.needs.budgetMin) q.push(state.language === "zh" ? "你的预算大概是每周多少澳币（AUD/week）？" : "What’s your weekly budget (AUD/week)?");
-        if (!state.needs.moveIn) q.push(state.language === "zh" ? "你希望什么时候入住（例如：这周/下周/具体日期）？" : "When do you want to move in (this week / next week / a date)?");
-
-        // keep <= 3
-        return q.slice(0, 3);
-      }
-
-      function summaryLine() {
-        const n = state.needs;
-        const rtMapZh = { single: "单人间", ensuite: "独立卫浴", twin: "双人间", studio: "Studio", null: "未指定" };
-        const rtMapEn = { single: "single room", ensuite: "ensuite", twin: "twin room", studio: "studio", null: "unspecified" };
-
-        const budget =
-          n.budgetMin && n.budgetMax
-            ? (state.language === "zh"
-                ? `预算：$${n.budgetMin}–$${n.budgetMax}/周`
-                : `Budget: $${n.budgetMin}–$${n.budgetMax}/week`)
-            : (state.language === "zh" ? "预算：未填写" : "Budget: not provided");
-
-        const room =
-          state.language === "zh"
-            ? `房型：${rtMapZh[n.roomType]}`
-            : `Room type: ${rtMapEn[n.roomType]}`;
-
-        const move =
-          n.moveIn
-            ? (state.language === "zh"
-                ? `入住：${n.moveIn === "next_week" ? "下周" : n.moveIn === "this_week" ? "本周" : n.moveIn}`
-                : `Move-in: ${n.moveIn === "next_week" ? "next week" : n.moveIn === "this_week" ? "this week" : n.moveIn}`)
-            : (state.language === "zh" ? "入住：未填写" : "Move-in: not provided");
-
-        const loc =
-          state.language === "zh"
-            ? `位置：${n.suburb}（Monash Clayton 周边）`
-            : `Location: ${n.suburb} (near Monash Clayton)`;
-
-        return `${loc}\n${room}\n${budget}\n${move}`;
-      }
-
-      function buildAnswer() {
-        const n = state.needs;
-        const missing = buildClarifyingQuestions();
-
-        if (state.language === "zh") {
-          let head = "好的，我理解你的需求了。我先把信息整理成“可决策”的格式：\n\n";
-          let summary = summaryLine() + "\n\n";
-          let guidance =
-            "基于 Monash Clayton 周边常见租房决策流程，我建议你下一步按这个顺序：\n" +
-            "1) 先确认房型（单人间 vs 独立卫浴）与入住时间\n" +
-            "2) 再锁定步行/公交通勤接受范围\n" +
-            "3) 最后进入看房与留资跟进\n\n";
-
-          if (missing.length) {
-            let qs = "为了更精准匹配，我只需要你补充 1–3 个关键信息：\n";
-            missing.forEach((x, i) => (qs += `${i + 1}) ${x}\n`));
-            qs += "\n你可以直接回复答案，或者点击下面的快捷问题。";
-            return head + summary + guidance + qs;
-          }
-
-          return (
-            head +
-            summary +
-            "太好了，你的信息已经足够进入“看房/推荐”阶段。\n\n" +
-            "下一步我建议：\n" +
-            "• 点击「预约看房」：安排 open inspection 或私约\n" +
-            "• 或点击「留下联系方式」：我会把你的需求整理给运营/顾问跟进\n"
-          );
-        } else {
-          let head = "Got it. Here is your request in a decision-ready format:\n\n";
-          let summary = summaryLine() + "\n\n";
-          let guidance =
-            "Suggested next steps:\n" +
-            "1) Confirm room type (single vs ensuite) and move-in time\n" +
-            "2) Define commute preference (walk/bus) and acceptable range\n" +
-            "3) Proceed to inspection scheduling and follow-up\n\n";
-
-          if (missing.length) {
-            let qs = "To match more accurately, please answer up to 3 quick questions:\n";
-            missing.forEach((x, i) => (qs += `${i + 1}) ${x}\n`));
-            qs += "\nReply with your answers or click a quick prompt below.";
-            return head + summary + guidance + qs;
-          }
-
-          return (
-            head +
-            summary +
-            "Great — you’re ready for inspection / shortlisting.\n\n" +
-            "Next actions:\n" +
-            "• Book an inspection\n" +
-            "• Leave your contact for operator follow-up\n"
-          );
-        }
-      }
-
-      function defaultChips() {
-        if (state.language === "zh") {
-          return [
-            "我想要单人间（Single）",
-            "我更偏好独立卫浴（Ensuite）",
-            "预算 280–320/周",
-            "下周入住",
-            "步行 10 分钟内"
-          ];
-        }
-        return [
-          "Single room preferred",
-          "Ensuite preferred",
-          "Budget 280–320/week",
-          "Move in next week",
-          "Within 10-min walk"
-        ];
-      }
-
-      async function send(text) {
-        const t = (text || "").trim();
-        if (!t) return;
-
-        btn.disabled = true;
-        add("user", t);
-
-        // Update needs based on user input
-        maybeUpdateNeeds(t);
-
-        // Simulate thinking
-        setTimeout(() => {
-          const reply = buildAnswer();
-          add("ai", reply);
-
-          // Update chips with clarifying questions or defaults
-          const qs = buildClarifyingQuestions();
-          setChips(qs.length ? qs : defaultChips());
-
-          btn.disabled = false;
-          inp.focus();
-        }, 350);
-      }
-
-      // Welcome
-      add(
-        "ai",
-        "你好，我是 LeaseMind。\n\n我可以帮助你把租房需求变成清晰的决策建议：预算、房型、距离、入住时间，并给出下一步（看房/留资）。\n\n请直接告诉我你的租房需求。"
-      );
-      setChips(defaultChips());
-
-      btn.onclick = () => send(inp.value), (inp.value = "");
-      btn.addEventListener("click", () => {
-        const v = inp.value;
-        inp.value = "";
-        send(v);
+    // chips
+    document.querySelectorAll(".chip").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        inp.value = el.getAttribute("data-fill") || "";
+        inp.focus();
       });
+    });
 
-      inp.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          const v = inp.value;
-          inp.value = "";
-          send(v);
-        }
-      });
-    </script>
-  </body>
+    // events
+    btn.addEventListener("click", send);
+    inp.addEventListener("keydown", (e)=>{ if(e.key==="Enter") send(); });
+
+    // welcome
+    add("assistant",
+      "你好！我是 LeaseMind（V2 Demo，本地模拟）。\n" +
+      "我会用 ≤3 个补问把你的租房需求变成“可执行决策”，并引导到预约看房或留资。\n\n" +
+      "你可以直接说：预算/房型/入住时间/离 Monash Clayton 多近。"
+    );
+    setStatus("Ready");
+  </script>
+</body>
 </html>
