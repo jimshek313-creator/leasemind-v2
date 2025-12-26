@@ -104,8 +104,8 @@
           <div class="actions">
             <button id="btn-inspect">进入看房流程（Demo）</button>
             <button id="btn-contact">生成客户需求记录（Demo）</button>
+         <button id="btn-copy">复制线索到剪贴板</button>
           </div>
-
           <div class="small" style="margin-top:8px;">
             * Demo 中按钮将模拟：生成预约请求 / 生成 CRM 线索卡（不会发送真实消息）。
           </div>
@@ -178,6 +178,7 @@
     const leadBox = document.getElementById("leadBox");
     const inspectBtn = document.getElementById("btn-inspect");
     const contactBtn = document.getElementById("btn-contact");
+const copyBtn = document.getElementById("btn-copy");
 
     function add(role, text){
       const div = document.createElement("div");
@@ -435,6 +436,38 @@
       "你可以直接说：预算/房型/入住时间/离 Monash Clayton 多近。"
     );
     setStatus("Ready");
+    // -----------------------
+// Copy Lead to Clipboard
+// -----------------------
+if (copyBtn){
+  copyBtn.onclick = async () => {
+    const c = state.confirmed;
+
+    const text =
+`【LeaseMind｜客户需求线索（Demo）】
+
+位置：${c.location}
+房型：${c.roomType || "未确认"}
+预算：${budgetText()}
+入住时间：${c.moveIn || "未确认"}
+通勤要求：${c.walkTime || "未指定"}
+
+看房预约：${state.lead.inspection || "未预约"}
+联系方式：${state.lead.contact || "未留下"}
+
+来源：LeaseMind V2.1 Demo
+状态：待顾问确认`;
+
+    try{
+      await navigator.clipboard.writeText(text);
+      add("assistant", "📋 已复制线索到剪贴板。\n你可以直接粘贴到微信 / 邮件 / CRM / Notion。");
+    }catch(e){
+      add("assistant", "⚠️ 浏览器未允许自动复制。你可以手动选择下方 Lead Card 内容复制。");
+    }
+  };
+}
+
   </script>
 </body>
 </html>
+
