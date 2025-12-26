@@ -442,8 +442,7 @@ const copyBtn = document.getElementById("btn-copy");
 if (copyBtn){
   copyBtn.onclick = async () => {
     const c = state.confirmed;
-
-    const text =
+const text =
 `【LeaseMind｜客户需求线索（Demo）】
 
 位置：${c.location}
@@ -455,7 +454,34 @@ if (copyBtn){
 看房预约：${state.lead.inspection || "未预约"}
 联系方式：${state.lead.contact || "未留下"}
 
+【顾问跟进备注（模板）】
+1) 需求确认（2分钟）
+- 房型确认：Single / Ensuite？
+- 是否接受合租：是/否
+- 最晚入住日期：____
+- 预算是否含账单：是/否
+
+2) 匹配与推荐（5分钟）
+- 推荐房源数量：3 个以内（A/B/C）
+- 每个房源需要确认：空房时间 / 租期 / 押金 / 账单 / 交通
+
+3) 看房安排（3分钟）
+- Open inspection：____
+- 私约时间：____
+- 到达方式/地址：____（确认后发）
+
+4) 风险与合规提示（1分钟）
+- 不在电话/消息里承诺“必有空房”
+- 以实际 availability 为准
+- 记录沟通要点并回填 CRM
+
+【系统字段（Demo）】
 来源：LeaseMind V2.1 Demo
+状态：待顾问确认
+优先级：P2（默认）`;
+
+    const text =
+
 状态：待顾问确认`;
 
     try{
@@ -470,4 +496,5 @@ if (copyBtn){
   </script>
 </body>
 </html>
+
 
