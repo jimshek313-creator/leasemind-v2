@@ -84,7 +84,7 @@
         <div class="card-b">
           <p class="hint">
             输入需求 → 系统最多补问 <b>≤3</b> 个关键信息 → 输出「可执行决策草案」→ 点击 <b>进入看房流程</b> / <b>生成客户需求记录</b> 完成闭环。<br/>
-            <span class="warn">演示原则：</span>没有数据就不猜；缺信息就问；不生成虚构房源细节（租金/距离/地址/空房）。
+            <span class="warn">演示原则：</span>没有数据就不猜；缺信息就问；不生成虚构房源细节（租金 / 距离 / 地址 / 空房）。
           </p>
 
           <div id="chat" class="chat"></div>
@@ -131,8 +131,8 @@
           <h3 style="margin:14px 0 8px 0;">The problem we solve</h3>
           <ul class="small" style="margin:0; padding-left:18px;">
             <li><b>Information overload</b>: users can’t compare options rationally</li>
-            <li><b>High friction</b>: repeated Q&A wastes consultant time</li>
-            <li><b>No decision layer</b>:咨询缺少“收敛成动作”的标准流程</li>
+            <li><b>High friction</b>: repeated Q&amp;A wastes consultant time</li>
+            <li><b>No decision layer</b>: 咨询缺少“收敛成动作”的标准流程</li>
           </ul>
 
           <h3 style="margin:14px 0 8px 0;">What this demo validates</h3>
@@ -157,8 +157,8 @@
           <ul class="small" style="margin:0; padding-left:18px;">
             <li>LLM + Guardrails + property dataset</li>
             <li>Inspection scheduling automation</li>
-            <li>CRM workflow for agents/operators</li>
-            <li>Expand to multi-campus & cities</li>
+            <li>CRM workflow for agents / operators</li>
+            <li>Expand to multi-campus &amp; cities</li>
           </ul>
 
           <div class="small" style="margin-top:12px;">LeaseMind © 2026 · For discussion and evaluation</div>
@@ -168,7 +168,9 @@
   </div>
 
   <script>
-    // Fail-safe: surface JS errors on page
+    // -----------------------
+    // Fail-safe: show script errors
+    // -----------------------
     const errBox = document.getElementById("errBox");
     window.addEventListener("error", (e)=>{
       try{
@@ -261,7 +263,7 @@
       const miss = [];
       if (!c.roomType) miss.push("房型（Single / Ensuite）");
       if (!c.budgetMin) miss.push("预算（每周 AUD 区间）");
-      if (!c.moveIn) miss.push("入住时间（例如：下周/本周六）");
+      if (!c.moveIn) miss.push("入住时间（例如：下周 / 本周六）");
       state.missing = miss;
       return miss;
     }
@@ -274,7 +276,7 @@
 
     function decisionDraft(){
       const c = state.confirmed;
-      const confirmed = [
+      const lines = [
         "【可执行决策草案｜V2.1】",
         "",
         "✅ 已确认信息（系统将据此执行）：",
@@ -282,35 +284,32 @@
         "• 房型偏好：" + (c.roomType || "未确认"),
         "• 预算区间：" + budgetText(),
         "• 入住时间：" + (c.moveIn || "未确认"),
-        c.walkTime ? ("• 通勤约束：步行 " + c.walkTime + " 到 Monash Clayton") : null,
-        "",
-      ].filter(Boolean);
-
-      const miss = computeMissing();
-      const missing = miss.length ? [
-        "🟨 待确认信息（缺失会降低匹配精度）：",
-        ...miss.slice(0,3).map(x => "• " + x),
-        ""
-      ] : [];
-
-      const next = [
-        "➡️ 系统下一步可执行动作（Demo）：",
-        "1) 生成“可看房房源池”（真实产品将来自房源库）",
-        "2) 安排 Open Inspection / 私约",
-        "3) 生成线索卡并交给运营/顾问跟进",
       ];
+      if (c.walkTime) lines.push("• 通勤约束：步行 " + c.walkTime + " 到 Monash Clayton");
 
-      return confirmed.concat(missing).concat(next).join("\n");
+      lines.push("");
+      const miss = computeMissing();
+      if (miss.length){
+        lines.push("🟨 待确认信息（缺失会降低匹配精度）：");
+        miss.slice(0,3).forEach(x => lines.push("• " + x));
+        lines.push("");
+      }
+      lines.push("➡️ 系统下一步可执行动作（Demo）：");
+      lines.push("1) 生成“可看房房源池”（真实产品将来自房源库）");
+      lines.push("2) 安排 Open Inspection / 私约");
+      lines.push("3) 生成线索卡并交给运营 / 顾问跟进");
+      return lines.join("\n");
     }
 
     function askClarifying(){
       const miss = state.missing.slice(0,3);
-      return [
+      const lines = [
         "为了避免我猜测导致错误，我需要补充最多 3 个关键信息：",
-        ...miss.map(x => "• 你希望的" + x + "是？"),
-        "",
-        "你也可以先点击下方按钮进入流程（Demo 会把该字段标记为“待确认”）。"
-      ].join("\n");
+      ];
+      miss.forEach(x => lines.push("• 你希望的" + x + "是？"));
+      lines.push("");
+      lines.push("你也可以先点击下方按钮进入流程（Demo 会把该字段标记为“待确认”）。");
+      return lines.join("\n");
     }
 
     function renderLead(){
@@ -326,20 +325,20 @@
       };
 
       leadBox.style.display = "block";
-      leadBox.innerHTML = `
-        <b>✅ CRM Lead Card（Demo 生成）</b>
-        <div class="small">
-          <span class="tag">Decision Layer Output</span>
-          <span class="tag">No Hallucination</span><br/><br/>
-          位置：${lead.location}<br/>
-          房型：${lead.roomType}<br/>
-          预算：${lead.budget}<br/>
-          入住：${lead.moveIn}<br/>
-          通勤：${lead.walk}<br/>
-          联系方式：<span class="${state.lead.contact ? "ok" : ""}">${lead.contact}</span><br/>
-          看房预约：<span class="${state.lead.inspection ? "ok" : ""}">${lead.inspection}</span>
-        </div>
-      `;
+      leadBox.innerHTML = [
+        "<b>✅ CRM Lead Card（Demo 生成）</b>",
+        '<div class="small">',
+        '<span class="tag">Decision Layer Output</span>',
+        '<span class="tag">No Hallucination</span><br/><br/>',
+        "位置：" + lead.location + "<br/>",
+        "房型：" + lead.roomType + "<br/>",
+        "预算：" + lead.budget + "<br/>",
+        "入住：" + lead.moveIn + "<br/>",
+        "通勤：" + lead.walk + "<br/>",
+        "联系方式：<span class='" + (state.lead.contact ? "ok" : "") + "'>" + lead.contact + "</span><br/>",
+        "看房预约：<span class='" + (state.lead.inspection ? "ok" : "") + "'>" + lead.inspection + "</span>",
+        "</div>"
+      ].join("");
     }
 
     async function send(){
@@ -358,23 +357,25 @@
         return;
       }
 
-      add("assistant",
-        "✅ 约束已足够，系统可进入执行。\n" +
-        "请点击：\n" +
-        "• 「进入看房流程」安排 inspection\n" +
+      add("assistant", [
+        "✅ 约束已足够，系统可进入执行。",
+        "请点击：",
+        "• 「进入看房流程」安排 inspection",
         "• 或「生成客户需求记录」生成线索卡交给顾问"
-      );
+      ].join("\n"));
       setStatus("Ready");
     }
 
-    // Buttons
+    // -----------------------
+    // Actions
+    // -----------------------
     inspectBtn.onclick = () => {
       const when = prompt("【Demo】你希望看房时间？（例如：本周六 2pm / 下周二上午）");
       state.lead.inspection = when ? when : "已提交（待确认时间）";
-      add("assistant",
-        "【Action】已生成看房预约请求 ✅\n" +
-        "下一步：顾问确认时间并发送地址/注意事项（真实产品将自动化）。"
-      );
+      add("assistant", [
+        "【Action】已生成看房预约请求 ✅",
+        "下一步：顾问确认时间并发送地址 / 注意事项（真实产品将自动化）。"
+      ].join("\n"));
       renderLead();
     };
 
@@ -385,73 +386,74 @@
         return;
       }
       state.lead.contact = contact;
-      add("assistant",
-        "【Action】已生成客户需求记录（Lead）✅\n" +
-        "我会把该线索交给运营/顾问跟进（真实产品将写入 CRM）。"
-      );
+      add("assistant", [
+        "【Action】已生成客户需求记录（Lead）✅",
+        "我会把该线索交给运营 / 顾问跟进（真实产品将写入 CRM）。"
+      ].join("\n"));
       renderLead();
     };
 
-    // Copy to clipboard (with C1 AT EASE template)
+    // Copy to clipboard (C1)
     copyBtn.onclick = async () => {
       const c = state.confirmed;
 
-      const text =
-`【LeaseMind｜客户需求线索（Demo）】
-
-位置：${c.location}
-房型：${c.roomType || "未确认"}
-预算：${budgetText()}
-入住时间：${c.moveIn || "未确认"}
-通勤要求：${c.walkTime || "未指定"}
-
-看房预约：${state.lead.inspection || "未预约"}
-联系方式：${state.lead.contact || "未留下"}
-
-【顾问跟进备注（AT EASE 标准模板）】
-
-1) 需求确认（2–3 分钟）
-- 房型确认：Single / Ensuite？
-- 是否接受合租：是 / 否
-- 最短租期：6 个月（如有例外需备注）
-- 入住日期是否灵活：是 / 否
-- 预算是否可微调：±$____ / 周
-
-2) 账单与费用说明（重点）
-- 账单政策：部分包含（通常含水 / 电 / 网络）
-- 是否存在使用上限：是 / 否（需确认）
-- 冬季取暖 / 空调费用：需按房源规则确认
-- 押金 / Bond：____ 周租金
-
-3) 房源匹配与推荐（5 分钟）
-- 推荐房源数量：≤3 个（A / B / C）
-- 每个房源需确认：
-  • 可入住时间
-  • 租期
-  • 是否包账单及上限
-  • 交通方式（步行 / 公交）
-  • House rules（如访客/安静时间）
-
-4) 看房安排（3 分钟）
-- Open inspection：____
-- 私约时间：____
-- 到达方式 / 地址：____（确认后发送）
-
-5) 合规与风险提示（必读）
-- 不承诺“必有空房”
-- Availability 以系统与现场确认为准
-- 重要沟通需记录并回填系统
-
-【系统字段（Demo）】
-来源：LeaseMind V2.1 Demo
-状态：待顾问确认
-优先级：P2（标准）`;
+      const text = [
+        "【LeaseMind｜客户需求线索（Demo）】",
+        "",
+        "位置：" + c.location,
+        "房型：" + (c.roomType || "未确认"),
+        "预算：" + budgetText(),
+        "入住时间：" + (c.moveIn || "未确认"),
+        "通勤要求：" + (c.walkTime || "未指定"),
+        "",
+        "看房预约：" + (state.lead.inspection || "未预约"),
+        "联系方式：" + (state.lead.contact || "未留下"),
+        "",
+        "【顾问跟进备注（AT EASE 标准模板）】",
+        "",
+        "1) 需求确认（2–3 分钟）",
+        "- 房型确认：Single / Ensuite？",
+        "- 是否接受合租：是 / 否",
+        "- 最短租期：6 个月（如有例外需备注）",
+        "- 入住日期是否灵活：是 / 否",
+        "- 预算是否可微调：±$____ / 周",
+        "",
+        "2) 账单与费用说明（重点）",
+        "- 账单政策：部分包含（通常含水 / 电 / 网络）",
+        "- 是否存在使用上限：是 / 否（需确认）",
+        "- 冬季取暖 / 空调费用：需按房源规则确认",
+        "- 押金 / Bond：____ 周租金",
+        "",
+        "3) 房源匹配与推荐（5 分钟）",
+        "- 推荐房源数量：≤3 个（A / B / C）",
+        "- 每个房源需确认：",
+        "  • 可入住时间",
+        "  • 租期",
+        "  • 是否包账单及上限",
+        "  • 交通方式（步行 / 公交）",
+        "  • House rules（如访客 / 安静时间）",
+        "",
+        "4) 看房安排（3 分钟）",
+        "- Open inspection：____",
+        "- 私约时间：____",
+        "- 到达方式 / 地址：____（确认后发送）",
+        "",
+        "5) 合规与风险提示（必读）",
+        "- 不承诺“必有空房”",
+        "- Availability 以系统与现场确认为准",
+        "- 重要沟通需记录并回填系统",
+        "",
+        "【系统字段（Demo）】",
+        "来源：LeaseMind V2.1 Demo",
+        "状态：待顾问确认",
+        "优先级：P2（标准）"
+      ].join("\n");
 
       try{
         await navigator.clipboard.writeText(text);
         add("assistant", "📋 已复制线索到剪贴板。\n你可以直接粘贴到微信 / 邮件 / CRM / Notion。");
       }catch(e){
-        add("assistant", "⚠️ 浏览器未允许自动复制。\n建议：点击浏览器地址栏左侧🔒 → Site settings → 允许 Clipboard。");
+        add("assistant", "⚠️ 浏览器未允许自动复制。\n建议：点击地址栏左侧🔒 → Site settings → 允许 Clipboard。");
       }
     };
 
@@ -467,12 +469,13 @@
     btn.addEventListener("click", send);
     inp.addEventListener("keydown", (e)=>{ if(e.key==="Enter") send(); });
 
-    // welcome
-    add("assistant",
-      "你好！我是 LeaseMind（V2.1 Investor Demo，本地模拟）。\n" +
-      "我不会编造房源事实；我会把你的需求收敛为“已确认约束 + 待确认缺口 + 可执行动作”。\n\n" +
-      "你可以直接说：预算/房型/入住时间/离 Monash Clayton 多近。"
-    );
+    // welcome (JS-safe multiline)
+    add("assistant", [
+      "你好！我是 LeaseMind（V2.1 Investor Demo，本地模拟）。",
+      "我不会编造房源事实；我会把你的需求收敛为“已确认约束 + 待确认缺口 + 可执行动作”。",
+      "",
+      "你可以直接说：预算 / 房型 / 入住时间 / 离 Monash Clayton 多近。"
+    ].join("\n"));
     setStatus("Ready");
   </script>
 </body>
