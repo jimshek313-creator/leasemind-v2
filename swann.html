@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swann – Demo V3</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 860px; margin: 24px auto; padding: 0 12px; }
+    .box { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
+    .msg { padding: 10px 12px; border: 1px solid #eee; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
+    .user { text-align: right; background: #fafafa; }
+    .assistant { text-align: left; }
+    .row { display: flex; gap: 8px; margin-top: 12px; }
+    input { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; }
+    button { padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; background: white; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    .hint { font-size: 13px; opacity: .7; margin-top: 8px; }
+    a.back{display:inline-block;margin:10px 0;text-decoration:none;color:#2563eb;}
+  </style>
+</head>
+<body>
+  <a class="back" href="/">← 返回入口</a>
+  <h1>Swann – 智能安防 AI 助手（Demo V3）</h1>
+  <p class="hint">把安防事件转化为系统判断与应对建议（Demo 模拟回复）</p>
+
+  <div class="box" id="chat"></div>
+
+  <div class="row">
+    <input id="inp" placeholder="试试输入：摄像头离线 / 夜间模式切换 / 门禁异常" />
+    <button id="btn">发送</button>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const inp = document.getElementById("inp");
+    const btn = document.getElementById("btn");
+
+    function add(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + (role === "user" ? "user" : "assistant");
+      div.textContent = text;
+      chat.appendChild(div);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    add("assistant",
+      "你好，我是 Swann 智能安防 AI 助手。\n\n你可以描述：摄像头离线、夜间模式、门禁异常等。\n我会给出可能原因、排查步骤与建议。\n\n（这是 Demo 模拟回复，用于展示产品逻辑）"
+    );
+
+    function send() {
+      const text = inp.value.trim();
+      if (!text) return;
+
+      inp.value = "";
+      btn.disabled = true;
+      add("user", text);
+
+      setTimeout(() => {
+        add("assistant",
+          "【Demo 模拟回复｜Swann】\n\n我已理解你的场景。\n\n建议步骤：\n1) 确认设备供电与网络状态\n2) 查看最近一次在线时间与告警\n3) 如为门禁异常，检查权限/日志/离线策略\n\n需要的话你可以补充：设备型号、发生时间、是否多设备同时异常。"
+        );
+        btn.disabled = false;
+        inp.focus();
+      }, 600);
+    }
+
+    btn.onclick = send;
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+  </script>
+</body>
+</html>
