@@ -3,348 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LeaseMind V2.1 Demo</title>
-  <link rel="icon" href="data:,">
+  <title>LeaseMind – Demo V3</title>
+
   <style>
-    :root{
-      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280;
-      --line:#e5e7eb; --blue:#2563eb; --soft:#f3f4f6;
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 16px;
+      background: #fafafa;
     }
-    *{box-sizing:border-box}
-    body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial;
-      background:var(--bg); color:var(--text);}
-    .wrap{max-width:1180px; margin:18px auto; padding:0 14px;}
-    .topbar{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:12px;}
-    .brand{font-weight:900; font-size:18px;}
-    .sub{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35;}
-    .mode{font-size:12px; color:var(--muted);}
-    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px;}
-    .card{background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,.04);}
-    .card-h{padding:12px 14px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;}
-    .card-b{padding:14px;}
-    .pill{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line);
-      border-radius:999px; padding:6px 10px; font-size:12px; color:var(--muted); background:#fafafa;}
-    .pill b{color:var(--text)}
-    .chat{height:420px; overflow:auto; padding:6px 2px;}
-    .msg{max-width:92%; padding:10px 12px; border-radius:12px; margin:8px 0; white-space:pre-wrap; line-height:1.35;}
-    .assistant{background:var(--soft); border:1px solid #eef2f7;}
-    .user{background:#eff6ff; border:1px solid #dbeafe; margin-left:auto;}
-    .hint{color:var(--muted); font-size:12px; margin:0 0 10px 0; line-height:1.35;}
-    .row{display:flex; gap:10px; margin-top:10px;}
-    input[type="text"]{flex:1; padding:12px 12px; border-radius:12px; border:1px solid var(--line); outline:none;}
-    button{padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; cursor:pointer; font-weight:800;}
-    button.primary{background:var(--blue); color:#fff; border-color:var(--blue);}
-    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
-    .chip{font-size:12px; border:1px solid var(--line); background:#fff; border-radius:999px; padding:8px 10px; cursor:pointer;}
-    .actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
-    .actions button{flex:1; min-width:180px;}
-    .note{font-size:12px; color:var(--muted); margin-top:10px; line-height:1.35;}
-    .lead{border:1px dashed #cbd5e1; border-radius:12px; padding:12px; background:#fafafa; margin-top:10px; display:none;}
-    .small{font-size:12px; color:var(--muted); line-height:1.45;}
-    .err{border:1px solid #fecaca; background:#fff1f2; color:#991b1b; border-radius:12px; padding:10px 12px; margin-top:10px; display:none;}
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr;}
-      .chat{height:380px;}
+    h1 {
+      margin-bottom: 8px;
+    }
+    .sub {
+      color: #666;
+      margin-bottom: 32px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      background: white;
+    }
+    .card h2 {
+      margin-top: 0;
+    }
+    .card p {
+      color: #555;
+    }
+    .card a {
+      display: inline-block;
+      margin-top: 12px;
+      text-decoration: none;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      color: #111;
+      background: #fff;
+    }
+    .card a:hover {
+      background: #f2f2f2;
+    }
+    .foot {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #888;
     }
   </style>
 </head>
 
 <body>
-  <!-- Text bank: all Chinese lives here, not inside <script> -->
-  <div id="T" style="display:none">
-    <div id="t_welcome">你好！我是 LeaseMind（V2.1 Investor Demo，本地模拟）。
-我不会编造房源事实；我会把你的需求收敛为“已确认约束 + 待确认缺口 + 可执行动作”。
 
-你可以直接说：预算 / 房型 / 入住时间 / 离 Monash Clayton 多近。</div>
-
-    <div id="t_hint">输入需求 → 系统最多补问 ≤3 个关键信息 → 输出「可执行决策草案」→ 点击 进入看房流程 / 生成客户需求记录 完成闭环。
-演示原则：没有数据就不猜；缺信息就问；不生成虚构房源细节（租金/距离/地址/空房）。</div>
-
-    <div id="t_action_done_inspect">【Action】已生成看房预约请求 ✅
-下一步：顾问确认时间并发送地址/注意事项（真实产品将自动化）。</div>
-
-    <div id="t_action_done_contact">【Action】已生成客户需求记录（Lead）✅
-我会把该线索交给运营/顾问跟进（真实产品将写入 CRM）。</div>
-
-    <div id="t_need_contact">【Action】未输入联系方式。你可以稍后再点「生成客户需求记录」，或继续补充需求。</div>
-
-    <div id="t_copied_ok">📋 已复制线索到剪贴板。你可以直接粘贴到微信/邮件/CRM/Notion。</div>
-
-    <div id="t_copy_fail">⚠️ 浏览器未允许自动复制。
-建议：点击地址栏左侧🔒 → Site settings → 允许 Clipboard。</div>
+  <h1>LeaseMind · Demo V3</h1>
+  <div class="sub">
+    One AI platform · Three independent agents<br>
+    Demo only · Mock scenarios · No real-world control
   </div>
 
-  <div class="wrap">
-    <div class="topbar">
-      <div>
-        <div class="brand">LeaseMind <span class="pill"><b>V2.1</b> Demo</span></div>
-        <div class="sub">
-          本地模拟（无 API） · 不编造房源事实 · 决策层 → 行动闭环（看房/留资/转人工）
-        </div>
-      </div>
-      <div class="mode">Mode: <b>Investor Demo（中文）</b> · Clarifying: <b>≤3</b></div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <div class="card-h">
-          <div><b>Live Demo Chat</b> <span class="pill">Decision Layer Simulator</span></div>
-          <div class="pill">Status: <b id="status">Ready</b></div>
-        </div>
-        <div class="card-b">
-
-          <p class="hint" id="hintText"></p>
-
-          <div id="chat" class="chat"></div>
-
-          <div class="chips">
-            <div class="chip" data-fill="我想在 Monash Clayton 附近找单人间，预算 280-320 澳币/周，下周入住">示例：Single 280-320/周 下周入住</div>
-            <div class="chip" data-fill="我更倾向独立卫浴（Ensuite），走路 10 分钟内到 Monash Clayton，预算 320-380/周">示例：Ensuite 10 分钟内 320-380/周</div>
-            <div class="chip" data-fill="我想先预约 open inspection，本周六下午有空">示例：预约 open inspection</div>
-            <div class="chip" data-fill="我想留下联系方式，让顾问联系我">示例：留下联系方式</div>
-          </div>
-
-          <div class="row">
-            <input id="inp" type="text" placeholder="例如：我想找 Single，预算 280-320/周，下周入住，离 Monash Clayton 步行 10 分钟内..." />
-            <button class="primary" onclick="window.LM_send && window.LM_send()">发送</button>
-          </div>
-
-          <div class="actions">
-            <button onclick="window.LM_inspect && window.LM_inspect()">进入看房流程（Demo）</button>
-            <button onclick="window.LM_contact && window.LM_contact()">生成客户需求记录（Demo）</button>
-            <button onclick="window.LM_copy && window.LM_copy()">复制线索到剪贴板</button>
-          </div>
-
-          <div id="leadBox" class="lead"></div>
-          <div id="errBox" class="err"></div>
-
-          <div class="note">
-            下一阶段：替换本地模拟为 LLM + Guardrails，并接入房源库、排期系统与 CRM。
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-h"><b>Investor View</b> <span class="pill">One-page</span></div>
-        <div class="card-b">
-          <h3 style="margin:0 0 8px 0;">What does LeaseMind do?</h3>
-          <div class="small">
-            LeaseMind sits <b>before listings and agents</b>, turning messy rental conversations into <b>structured decisions</b> and <b>next actions</b>.
-          </div>
-
-          <h3 style="margin:14px 0 8px 0;">The problem we solve</h3>
-          <ul class="small" style="margin:0; padding-left:18px;">
-            <li><b>Information overload</b></li>
-            <li><b>High friction</b></li>
-            <li><b>No decision layer</b></li>
-          </ul>
-
-          <h3 style="margin:14px 0 8px 0;">What this demo validates</h3>
-          <ul class="small" style="margin:0; padding-left:18px;">
-            <li>结构化输出：已确认约束 / 待确认缺口</li>
-            <li>补问控制：≤3 个关键问题</li>
-            <li>闭环：看房流程 / 留资线索 / 转人工</li>
-          </ul>
-
-          <h3 style="margin:14px 0 8px 0;">Next phase</h3>
-          <ul class="small" style="margin:0; padding-left:18px;">
-            <li>LLM + Guardrails + dataset</li>
-            <li>Inspection scheduling automation</li>
-            <li>CRM workflow</li>
-            <li>Multi-campus expansion</li>
-          </ul>
-
-          <div class="small" style="margin-top:12px;">LeaseMind © 2026 · For discussion and evaluation</div>
-        </div>
-      </div>
-    </div>
+  <div class="card">
+    <h2>AT EASE</h2>
+    <p>
+      AI-guided rental decision assistant for international students.<br>
+      Focus: 3D viewing, decision clarity, booking conversion.
+    </p>
+    <a href="./at%20ease.html">进入 AT EASE Demo →</a>
   </div>
 
-  <script>
-    (function(){
-      function byId(id){ return document.getElementById(id); }
-      function txt(id){ var el = byId(id); return el ? (el.textContent || "").trim() : ""; }
+  <div class="card">
+    <h2>Swann</h2>
+    <p>
+      Smart home & security AI assistant.<br>
+      Focus: incident explanation, system response, compliance logging.
+    </p>
+   <a href="./swann.html">进入 Swann Demo →</a>
+  </div>
 
-      var errBox = byId("errBox");
-      window.addEventListener("error", function(e){
-        try{
-          errBox.style.display = "block";
-          errBox.textContent = "JS error: " + (e && e.message ? e.message : "unknown");
-        }catch(_){}
-      });
+  <div class="card">
+    <h2>Ever Green Herb</h2>
+    <p>
+      Market entry AI assistant for herbal products.<br>
+      Focus: AU & Asia compliance, non-medical communication.
+    </p>
+   <a href="./evergreen.html">进入 Ever Green Herb Demo →</a>
+  </div>
 
-      var statusEl = byId("status");
-      function setStatus(s){ statusEl.textContent = s; }
+  <div class="foot">
+    LeaseMind Demo V3 · For discussion and validation only
+  </div>
 
-      var chat = byId("chat");
-      function add(role, text){
-        var div = document.createElement("div");
-        div.className = "msg " + (role === "user" ? "user" : "assistant");
-        div.innerText = text;
-        chat.appendChild(div);
-        chat.scrollTop = chat.scrollHeight;
-      }
-
-      byId("hintText").innerText = txt("t_hint");
-
-      var inp = byId("inp");
-
-      var state = {
-        roomType: null,
-        budgetMin: null,
-        budgetMax: null,
-        moveIn: null,
-        walkTime: null,
-        contact: null,
-        inspection: null
-      };
-
-      function parseInput(text){
-        var lower = (text || "").toLowerCase();
-
-        if (lower.indexOf("ensuite") >= 0 || text.indexOf("独立卫浴") >= 0 || text.indexOf("套房") >= 0) state.roomType = "Ensuite";
-        if (lower.indexOf("single") >= 0 || text.indexOf("单人间") >= 0 || text.indexOf("单人房") >= 0) state.roomType = "Single";
-
-        var m = text.match(/(\d{2,4})\s*[-~到]\s*(\d{2,4})/);
-        if (m){
-          var a = parseInt(m[1],10), b = parseInt(m[2],10);
-          if (!isNaN(a) && !isNaN(b)){ state.budgetMin = Math.min(a,b); state.budgetMax = Math.max(a,b); }
-        }
-
-        if (text.indexOf("下周") >= 0) state.moveIn = "下周";
-        else if (text.indexOf("本周") >= 0 || text.indexOf("这周") >= 0) state.moveIn = "本周";
-        else if (text.indexOf("周六") >= 0) state.moveIn = "周六";
-        else if (text.indexOf("周日") >= 0) state.moveIn = "周日";
-
-        var wt = text.match(/(\d{1,2})\s*分钟/);
-        if (wt) state.walkTime = wt[1] + "分钟内";
-      }
-
-      function missingFields(){
-        var miss = [];
-        if (!state.roomType) miss.push("房型（Single/Ensuite）");
-        if (!state.budgetMin) miss.push("预算（每周区间）");
-        if (!state.moveIn) miss.push("入住时间（如：下周/本周六）");
-        return miss;
-      }
-
-      function budgetText(){
-        if (state.budgetMin && state.budgetMax) return "AUD " + state.budgetMin + "-" + state.budgetMax + " / 周";
-        return "未提供";
-      }
-
-      function decisionText(){
-        var lines = [];
-        lines.push("【可执行决策草案｜V2.1】");
-        lines.push("");
-        lines.push("已确认信息：");
-        lines.push("• 位置：Monash Clayton 周边");
-        lines.push("• 房型偏好：" + (state.roomType ? state.roomType : "未确认"));
-        lines.push("• 预算区间：" + budgetText());
-        lines.push("• 入住时间：" + (state.moveIn ? state.moveIn : "未确认"));
-        if (state.walkTime) lines.push("• 通勤约束：步行 " + state.walkTime);
-        lines.push("");
-        var miss = missingFields();
-        if (miss.length){
-          lines.push("待确认信息（最多 3 个）：");
-          for (var i=0;i<Math.min(3, miss.length);i++) lines.push("• " + miss[i]);
-          lines.push("");
-          lines.push("你也可以直接点下方按钮进入流程（Demo 会标记为待确认）。");
-        } else {
-          lines.push("约束已足够，可进入执行：看房/留资/转人工。");
-        }
-        return lines.join("\n");
-      }
-
-      function renderLead(){
-        var leadBox = byId("leadBox");
-        var lines = [];
-        lines.push("CRM Lead Card（Demo）");
-        lines.push("");
-        lines.push("位置：Monash Clayton 周边");
-        lines.push("房型：" + (state.roomType ? state.roomType : "未确认"));
-        lines.push("预算：" + budgetText());
-        lines.push("入住：" + (state.moveIn ? state.moveIn : "未确认"));
-        lines.push("通勤：" + (state.walkTime ? state.walkTime : "未指定"));
-        lines.push("看房：" + (state.inspection ? state.inspection : "未预约"));
-        lines.push("联系方式：" + (state.contact ? state.contact : "未留下"));
-        leadBox.style.display = "block";
-        leadBox.innerText = lines.join("\n");
-      }
-
-      function send(){
-        var text = (inp.value || "").trim();
-        if (!text) return;
-        setStatus("Thinking");
-        add("user", text);
-        inp.value = "";
-        parseInput(text);
-        add("assistant", decisionText());
-        setStatus("Ready");
-      }
-
-      function onInspect(){
-        var when = prompt("【Demo】你希望看房时间？（例如：本周六 2pm / 下周二上午）");
-        state.inspection = when ? when : "已提交（待确认）";
-        add("assistant", txt("t_action_done_inspect"));
-        renderLead();
-      }
-
-      function onContact(){
-        var c = prompt("【Demo】请输入联系方式（微信/手机/邮箱）：");
-        if (!c){
-          add("assistant", txt("t_need_contact"));
-          return;
-        }
-        state.contact = c;
-        add("assistant", txt("t_action_done_contact"));
-        renderLead();
-      }
-
-      function onCopy(){
-        var out = [];
-        out.push("【LeaseMind｜客户需求线索（Demo）】");
-        out.push("");
-        out.push("位置：Monash Clayton 周边");
-        out.push("房型：" + (state.roomType ? state.roomType : "未确认"));
-        out.push("预算：" + budgetText());
-        out.push("入住：" + (state.moveIn ? state.moveIn : "未确认"));
-        out.push("通勤：" + (state.walkTime ? state.walkTime : "未指定"));
-        out.push("看房：" + (state.inspection ? state.inspection : "未预约"));
-        out.push("联系方式：" + (state.contact ? state.contact : "未留下"));
-        var text = out.join("\n");
-
-        if (navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(text).then(function(){
-            add("assistant", txt("t_copied_ok"));
-          }).catch(function(){
-            add("assistant", txt("t_copy_fail"));
-          });
-        } else {
-          add("assistant", txt("t_copy_fail"));
-        }
-      }
-
-      window.LM_send = send;
-      window.LM_inspect = onInspect;
-      window.LM_contact = onContact;
-      window.LM_copy = onCopy;
-
-      inp.addEventListener("keydown", function(e){
-        if (e && e.key === "Enter") send();
-      });
-
-      var chips = document.querySelectorAll(".chip");
-      for (var i=0;i<chips.length;i++){
-        chips[i].addEventListener("click", function(){
-          inp.value = this.getAttribute("data-fill") || "";
-          inp.focus();
-        });
-      }
-
-      add("assistant", txt("t_welcome"));
-      setStatus("Ready");
-    })();
-  </script>
 </body>
 </html>
