@@ -2,36 +2,90 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AT EASE – Demo V3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AT EASE · LeaseMind Demo V3</title>
+  <link rel="icon" href="data:,">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 860px; margin: 24px auto; padding: 0 12px; }
-    .box { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
-    .msg { padding: 10px 12px; border: 1px solid #eee; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
-    .user { text-align: right; background: #fafafa; }
-    .assistant { text-align: left; }
-    .row { display: flex; gap: 8px; margin-top: 12px; }
-    input { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; }
-    button { padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; background: white; cursor: pointer; }
-    button:disabled { opacity: .6; cursor: not-allowed; }
-    .hint { font-size: 13px; opacity: .7; margin-top: 8px; }
-    a.back{display:inline-block;margin:10px 0;text-decoration:none;color:#2563eb;}
+    :root{
+      --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b;
+      --line:#e5e7eb; --blue:#2563eb; --blue2:#1d4ed8; --soft:#f1f5f9;
+      --shadow:0 10px 30px rgba(2,6,23,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg); color:var(--text);}
+    a{color:inherit}
+    .wrap{max-width:980px; margin:0 auto; padding:18px 14px 60px;}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0;}
+    .brand{display:flex; gap:10px; align-items:center;}
+    .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0f172a,#334155);
+      box-shadow:0 10px 25px rgba(2,6,23,.18);}
+    .brand b{font-size:14px; letter-spacing:.2px}
+    .brand span{display:block; font-size:12px; color:var(--muted); margin-top:2px}
+    .nav{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+    .pill{font-size:12px; padding:8px 10px; border:1px solid var(--line); border-radius:999px; background:#fff; text-decoration:none;}
+    .pill:hover{border-color:#cbd5e1}
+    .cta{background:var(--blue); color:#fff; border-color:transparent;}
+    .cta:hover{background:var(--blue2)}
+    .hero{background:#fff; border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); padding:16px 16px 14px;}
+    .hero h1{margin:0; font-size:20px}
+    .hero p{margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.6}
+    .app{margin-top:12px; background:#fff; border:1px solid var(--line); border-radius:22px; box-shadow:0 10px 25px rgba(2,6,23,.06); padding:14px;}
+    .chat{border:1px solid var(--line); border-radius:16px; padding:12px; background:#fff; min-height:340px;}
+    .msg{padding:10px 12px; border:1px solid #eef2f7; border-radius:14px; margin:8px 0; white-space:pre-wrap;}
+    .user{text-align:right; background:#fafafa;}
+    .assistant{text-align:left; background:#fff;}
+    .row{display:flex; gap:10px; margin-top:12px;}
+    input{flex:1; padding:12px 12px; border-radius:14px; border:1px solid var(--line); background:#fff;}
+    button{padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:#fff; cursor:pointer;}
+    button:hover{border-color:#cbd5e1}
+    button:disabled{opacity:.6; cursor:not-allowed;}
+    .foot{margin-top:10px; color:var(--muted); font-size:12px; line-height:1.6}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+    @media (max-width:720px){ .row{flex-direction:column} button{width:100%} }
   </style>
 </head>
 <body>
-  <a class="back" href="/">← 返回入口</a>
-  <h1>AT EASE – 留学生租房决策 AI 助手（Demo V3）</h1>
-  <p class="hint">把零散的租房问题，转化为清晰的决策建议与下一步行动（Demo 模拟回复）</p>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <b>LeaseMind · AT EASE</b>
+          <span>Student housing decision agent · Demo V3</span>
+        </div>
+      </div>
+      <div class="nav">
+        <a class="pill" href="/">首页</a>
+        <a class="pill" href="/swann.html">Swann</a>
+        <a class="pill" href="/evergreen.html">Ever Green Herb</a>
+        <a class="pill cta" href="#chat">开始体验</a>
+      </div>
+    </div>
 
-  <div class="box" id="chat"></div>
+    <div class="hero">
+      <h1>AT EASE｜留学生租房决策 AI 助手</h1>
+      <p>把预算/房型/距离/入住时间等零散问题，整理成清晰决策建议与下一步行动（例如预约看房）。<br>
+      <b>提示：</b>当前为 <span class="mono">Demo 模拟回复</span>，用于展示产品逻辑。</p>
+    </div>
 
-  <div class="row">
-    <input id="inp" placeholder="试试输入：我想在 Monash Clayton 附近找单人间，预算 $280–$320/周，下周入住" />
-    <button id="btn">发送</button>
+    <div class="app" id="chat">
+      <div class="chat" id="chatbox"></div>
+
+      <div class="row">
+        <input id="inp" placeholder="试试输入：我想在 Monash Clayton 附近找单人间，预算 $280–$320/周，下周入住" />
+        <button id="btn">发送</button>
+      </div>
+
+      <div class="foot">
+        建议问法：预算/房型/入住时间/是否含账单/最短租期。<br>
+        返回入口：<a href="/" class="mono">/</a>
+      </div>
+    </div>
   </div>
 
   <script>
-    const chat = document.getElementById("chat");
+    const chat = document.getElementById("chatbox");
     const inp = document.getElementById("inp");
     const btn = document.getElementById("btn");
 
@@ -40,6 +94,7 @@
       div.className = "msg " + (role === "user" ? "user" : "assistant");
       div.textContent = text;
       chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
       window.scrollTo(0, document.body.scrollHeight);
     }
 
