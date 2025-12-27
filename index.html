@@ -3,96 +3,163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LeaseMind – Demo V3</title>
-
+  <title>LeaseMind · AI Agent Platform · Demo V3</title>
+  <link rel="icon" href="data:,">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 0 16px;
-      background: #fafafa;
+    :root{
+      --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b;
+      --line:#e5e7eb; --blue:#2563eb; --blue2:#1d4ed8; --soft:#f1f5f9;
+      --shadow:0 10px 30px rgba(2,6,23,.08);
+      --r:16px;
     }
-    h1 {
-      margin-bottom: 8px;
+    *{box-sizing:border-box}
+    body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg); color:var(--text);}
+    a{color:inherit}
+    .wrap{max-width:1120px; margin:0 auto; padding:18px 14px 60px;}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0;}
+    .brand{display:flex; gap:10px; align-items:center;}
+    .logo{
+      width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#0f172a,#334155);
+      box-shadow:0 10px 25px rgba(2,6,23,.18);
     }
-    .sub {
-      color: #666;
-      margin-bottom: 32px;
+    .brand h1{font-size:14px; margin:0; font-weight:900; letter-spacing:.2px}
+    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted)}
+    .nav{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+    .pill{font-size:12px; padding:8px 10px; border:1px solid var(--line); border-radius:999px; background:#fff; text-decoration:none;}
+    .pill:hover{border-color:#cbd5e1}
+    .cta{background:var(--blue); color:#fff; border-color:transparent;}
+    .cta:hover{background:var(--blue2)}
+    .hero{
+      margin-top:10px; background:radial-gradient(1200px 400px at 20% 0%, #dbeafe 0%, rgba(219,234,254,0) 55%),
+                         radial-gradient(900px 360px at 90% 30%, #e0f2fe 0%, rgba(224,242,254,0) 55%),
+                         #fff;
+      border:1px solid var(--line); border-radius:24px; box-shadow:var(--shadow);
+      padding:22px 18px;
+      display:grid; grid-template-columns:1.15fr .85fr; gap:14px;
     }
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 16px;
-      background: white;
+    .hero h2{margin:0; font-size:28px; line-height:1.15; letter-spacing:-.2px}
+    .hero .sub{margin-top:10px; color:var(--muted); font-size:14px; line-height:1.6}
+    .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
+    .kpi{background:var(--soft); border:1px solid #e2e8f0; border-radius:14px; padding:10px;}
+    .kpi b{display:block; font-size:13px}
+    .kpi span{display:block; font-size:12px; color:var(--muted); margin-top:2px}
+    .panel{background:#fff; border:1px solid var(--line); border-radius:20px; padding:14px; box-shadow:0 10px 25px rgba(2,6,23,.06)}
+    .panel h3{margin:0; font-size:14px}
+    .panel p{margin:8px 0 0; font-size:12px; color:var(--muted); line-height:1.55}
+    .panel .btnrow{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+    .btn{display:inline-block; text-decoration:none; font-size:12px; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:#fff}
+    .btn:hover{border-color:#cbd5e1}
+    .btn.primary{background:var(--blue); color:#fff; border-color:transparent}
+    .btn.primary:hover{background:var(--blue2)}
+    .section{margin-top:18px}
+    .section h4{margin:0 0 10px; font-size:13px; color:#0f172a}
+    .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+    .card{
+      background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px;
+      box-shadow:0 8px 22px rgba(2,6,23,.06);
+      display:flex; flex-direction:column; gap:10px;
+      transition:transform .08s ease, box-shadow .08s ease;
     }
-    .card h2 {
-      margin-top: 0;
-    }
-    .card p {
-      color: #555;
-    }
-    .card a {
-      display: inline-block;
-      margin-top: 12px;
-      text-decoration: none;
-      padding: 10px 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      color: #111;
-      background: #fff;
-    }
-    .card a:hover {
-      background: #f2f2f2;
-    }
-    .foot {
-      margin-top: 40px;
-      font-size: 12px;
-      color: #888;
+    .card:hover{transform:translateY(-2px); box-shadow:0 14px 32px rgba(2,6,23,.10)}
+    .tag{display:inline-flex; gap:6px; align-items:center; font-size:11px; color:var(--muted)}
+    .dot{width:8px; height:8px; border-radius:99px; background:#94a3b8}
+    .card h5{margin:0; font-size:16px}
+    .card p{margin:0; color:var(--muted); font-size:12px; line-height:1.55}
+    .card .go{margin-top:6px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+    .arrow{font-size:14px; color:var(--blue)}
+    .foot{margin-top:18px; color:var(--muted); font-size:12px; line-height:1.6}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
+    @media (max-width: 900px){
+      .hero{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr}
+      .kpis{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>LeaseMind</h1>
+          <p>AI Agent Platform · Demo V3（公网可测试）</p>
+        </div>
+      </div>
+      <div class="nav">
+        <a class="pill" href="#demos">Demo</a>
+        <a class="pill" href="#how">怎么用</a>
+        <a class="pill cta" href="#demos">进入演示</a>
+      </div>
+    </div>
 
-  <h1>LeaseMind · Demo V3</h1>
-  <div class="sub">
-    One AI platform · Three independent agents<br>
-    Demo only · Mock scenarios · No real-world control
+    <div class="hero">
+      <div>
+        <h2>一个平台 · 三个行业 Agent</h2>
+        <div class="sub">
+          LeaseMind 不是三个产品，而是一个可复制的 Agent Platform：同一交互与底层结构，
+          不同行业规则与输出。当前为 <b>Mock AI</b> 用于展示产品逻辑（不调用真实 API）。
+        </div>
+        <div class="kpis">
+          <div class="kpi"><b>AT EASE</b><span>住宿决策 → 预约转化</span></div>
+          <div class="kpi"><b>Swann</b><span>安防事件解释 → 处理建议</span></div>
+          <div class="kpi"><b>Ever Green Herb</b><span>市场进入 → 合规表达</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="how">
+        <h3>建议观看顺序（2–3 分钟）</h3>
+        <p>依次点击 AT EASE → Swann → Ever Green Herb。每页输入一句话测试“发送”，即可看到模拟回复。</p>
+        <div class="btnrow">
+          <a class="btn primary" href="#demos">从 Demo 开始</a>
+          <a class="btn" href="/at_ease.html">直接进 AT EASE</a>
+        </div>
+        <p class="foot">
+          访问地址：<span class="mono">/at_ease.html</span> · <span class="mono">/swann.html</span> · <span class="mono">/evergreen.html</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="section" id="demos">
+      <h4>Demo 入口</h4>
+      <div class="grid">
+        <div class="card">
+          <div class="tag"><span class="dot"></span>Student Housing · Decision</div>
+          <h5>AT EASE</h5>
+          <p>留学生租房决策助手：把预算/房型/距离/入住时间整理成可执行的下一步（例如预约看房）。</p>
+          <div class="go">
+            <a class="btn primary" href="/at_ease.html">进入 AT EASE Demo</a>
+            <span class="arrow">→</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="tag"><span class="dot"></span>Smart Home · Security</div>
+          <h5>Swann</h5>
+          <p>智能安防事件解释助手：摄像头离线、夜间模式、门禁异常等，输出系统判断与排查建议。</p>
+          <div class="go">
+            <a class="btn primary" href="/swann.html">进入 Swann Demo</a>
+            <span class="arrow">→</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="tag"><span class="dot"></span>Market Entry · Compliance</div>
+          <h5>Ever Green Herb</h5>
+          <p>草本产品市场进入助手：澳洲 & 亚洲，非医疗合规表达、沟通边界、渠道风险提示。</p>
+          <div class="go">
+            <a class="btn primary" href="/evergreen.html">进入 Ever Green Herb Demo</a>
+            <span class="arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <b>注意：</b>当前为 Demo 模拟回复，用于展示产品逻辑和跨行业适配能力。进入 Phase-2 Pilot 后再接入真实 API 与数据。
+      </div>
+    </div>
   </div>
-
-  <div class="card">
-    <h2>AT EASE</h2>
-    <p>
-      AI-guided rental decision assistant for international students.<br>
-      Focus: 3D viewing, decision clarity, booking conversion.
-    </p>
-   <a href="/at_ease.html">进入 AT EASE Demo →</a>
-  </div>
-
-  <div class="card">
-    <h2>Swann</h2>
-    <p>
-      Smart home & security AI assistant.<br>
-      Focus: incident explanation, system response, compliance logging.
-    </p>
-   <a href="/swann.html">进入 Swann Demo →</a>
-  </div>
-
-  <div class="card">
-    <h2>Ever Green Herb</h2>
-    <p>
-      Market entry AI assistant for herbal products.<br>
-      Focus: AU & Asia compliance, non-medical communication.
-    </p>
-   <a href="/evergreen.html">进入 Ever Green Herb Demo →</a>
-  </div>
-
-  <div class="foot">
-    LeaseMind Demo V3 · For discussion and validation only
-  </div>
-
 </body>
 </html>
-
